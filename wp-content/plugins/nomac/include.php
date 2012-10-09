@@ -36,15 +36,56 @@ function table_exists($table)
 
 
 function create_table($tablename, $sql, $option, $version) {
-	if (table_exists($tablename)) 
-		return;
-
 	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
 	dbDelta($sql);
 	add_option($option, $version);
 	
 	return table_exists($tablename);
+}
+
+
+function cleanInput($input, $striptags=false) {
+
+    $input = trim($input);
+
+    if(get_magic_quotes_gpc())
+    {
+        $input = stripslashes($input);
+    } 
+
+    
+    if ($striptags) {
+    	$input = strip_tags($input);
+    } else {
+		$input = htmlentities($input, ENT_QUOTES);
+	}
+	$input = mysql_escape_string($input);
+
+    return $input;
+}
+
+
+function outputDropdown($tablenameWithoutPrefix, $controlName, $showDefault = true) {
+	global $wpdb;
+	$tablename = $wpdb->prefix . $tablenameWithoutPrefix;
+	
+	$rows = $wpdb->get_results("SELECT Code, Name FROM " . $tablename);
+	$out  = "";
+	$out .= '<select name="' . $controlName . '" >';	
+	if ($showDefault) {
+		$out .= '<option value="" selected="true">Maak een keuze</option>';
+	}
+	foreach ($rows as $row) {
+		if (isset($_REQUEST[$controlName]) && $_REQUEST[$controlName] == $row->Code) {
+			$out .= '<option selected="selected" value="' . $row->Code . '">' . $row->Name . '</option>';
+		} else {
+			$out .= '<option value="' . $row->Code . '">' . $row->Name . '</option>';
+		}
+	}
+	$out .= '</select>';
+
+	return $out;
 }
 
 

@@ -16,17 +16,24 @@ require_once("include.php");
 /* Licensing Form and Lists */ 
 require_once("licensingform.php");
 require_once("licensinglist.php");
+require_once("rulechangeform.php");
+require_once("rulechangelist.php");
 require_once("imagewidget.php");
 require_once("linkwidget.php");
 require_once("latestnewswidget.php");
 require_once("admin/nomac.php");
 require_once("admin/licensing.php");
+require_once("admin/rulechange.php");
 require_once("admin/imagewidget.php");
 
 
 add_shortcode('nomac-licensing-form', 'outputNomacLicensingForm');
 add_shortcode('nomac-licensing-list', 'outputNomacLicensingList');
 add_shortcode('nomac-licensing-totals', 'outputNomacLicensingTotals');
+add_shortcode('nomac-rulechange-form', 'outputNomacRulechangeForm');
+add_shortcode('nomac-rulechange-list', 'outputNomacRulechangeList');
+add_shortcode('nomac-rulechange-totals', 'outputNomacRulechangeTotals');
+
 
 
 /* Installation / DB Creation */
@@ -48,7 +55,7 @@ function nomac_imagecycle_install() {
 
 function nomac_rulechange_install() {
 	require_once("dbinstall.php");
-	createLicensingTable();
+	createRulechangeTable();
 }
 
 function nomac_add_capabilities() {

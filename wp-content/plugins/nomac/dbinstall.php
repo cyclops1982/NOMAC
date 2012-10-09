@@ -11,7 +11,8 @@ function createImageCycleTable() {
                 title varchar(200) NOT NULL default '',
                 image_url text NOT NULL,
                 link_url text NULL,
-                PRIMARY KEY (id));";
+                PRIMARY KEY  (id))
+		;";
 	create_table($tablename, $sql, "nomac_imagecycle_version", "1.1");
 
 	$wpdb->hide_errors();
@@ -23,10 +24,12 @@ function createRulechangeTable() {
 	$wpdb->show_errors();	
 
 	$tablename = $wpdb->prefix . TABLE_RULECHANGE;
-	$sql = "CREATE TABLE IF NOT EXISTS " . $tablename . " (
+	$sql = "CREATE TABLE " . $tablename . " (
 			Id bigint(20) unsigned not null auto_increment,
+			Year YEAR(4) not null,
+			SubmittedByIp varchar(64) not null,
 			SubmittedOn TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-			SubmitterBy varchar(200) not null,
+			SubmittedBy varchar(200) not null,
 			SubmitterEmail varchar(200) not null,
 			Class varchar(10) not null,
 			Page varchar(20) NULL,
@@ -34,9 +37,11 @@ function createRulechangeTable() {
 			OldText MEDIUMTEXT,
 			NewText MEDIUMTEXT,
 			Comment MEDIUMTEXT,
-			primary key(Id)
+			PRIMARY KEY  (Id)
 		);";
 	create_table($tablename, $sql, "nomac_rulechange_version", "1.0");
+
+	$wpdb->hide_errors();
 }
 
 
@@ -46,7 +51,7 @@ function createLicensingTable() {
 
 	
 	$tablename = $wpdb->prefix . TABLE_LICENSING;
-	$sql = "CREATE TABLE IF NOT EXISTS " . $tablename . " (
+	$sql = "CREATE TABLE " . $tablename . " (
 			Id bigint(20) unsigned not null auto_increment,
 			Voornaam varchar(100) not null,
 			Achternaam varchar(100) not null,
@@ -60,6 +65,7 @@ function createLicensingTable() {
 			LidBijClub varchar(100) not null,
 			Freq1 varchar(20) not null,
 			Freq2 varchar(20) null,
+			Freq3 varchar(20) null,
 			Transponder varchar(10) not null,
 			VorigeLicentieNr varchar(10) not null,
 			Klasse varchar(10) not null,
@@ -69,20 +75,20 @@ function createLicensingTable() {
 			RegistrationDate datetime not null,
 			foto mediumblob not null,
 			fotoContentType varchar(50) not null,
-			primary key(Id)
+			PRIMARY KEY  (Id)
 		);";
-	create_table($tablename, $sql, "licensing_version", "0.1");
+	create_table($tablename, $sql, "licensing_version", "0.5.1");
 
 
 	$tablename = $wpdb->prefix . TABLE_FREQUENCY;
-	$sql = "CREATE TABLE IF NOT EXISTS " . $tablename . " (
+	$sql = "CREATE TABLE IF " . $tablename . " (
 			Id int unsigned not null auto_increment,
 			Code varchar(10) not null,
 			Name varchar(150) not null,
-			primary key(Id),
-			UNIQUE(Code)
+			PRIMARY KEY  (Id),
+			UNIQUE KEY Code_Unique (Code)
 		);";
-	create_table($tablename, $sql, "licensing_version", "0.2");
+	create_table($tablename, $sql, "licensing_version", "0.5.2");
 	if ($wpdb->get_var("SELECT COUNT(Code) FROM $tablename") == 0) {
                 $data = array();
 
@@ -174,14 +180,14 @@ function createLicensingTable() {
 	}	
 
 	$tablename = $wpdb->prefix . TABLE_CLUBS;
-	$sql = "CREATE TABLE IF NOT EXISTS " . $tablename . " (
+	$sql = "CREATE TABLE IF " . $tablename . " (
 			Id int unsigned not null auto_increment,
 			Code varchar(20) not null,
 			Name varchar(150) not null,
-			UNIQUE(Code),
-			primary key(Id)
+			UNIQUE KEY UN_Code (Code),
+			PRIMARY KEY  (Id)
 		);";
-	create_table($tablename, $sql, "licensing_version", "0.3");
+	create_table($tablename, $sql, "licensing_version", "0.5.3");
 
 	if ($wpdb->get_var("SELECT COUNT(Code) FROM $tablename") == 0) {
 		$data = array();
@@ -256,7 +262,7 @@ function createLicensingTable() {
 	}
 
 	$tablename = $wpdb->prefix . TABLE_CLASS;
-	$sql = "CREATE TABLE IF NOT EXISTS " . $tablename . " (
+	$sql = "CREATE TABLE " . $tablename . " (
 			Id int unsigned not null auto_increment,
 			Code varchar(10) not null,
 			Name varchar(150) not null,
@@ -264,10 +270,10 @@ function createLicensingTable() {
 			MaxDrivers tinyint NULL,
 			MaxDriversCloseDate DATE NULL,
 			Price tinyint NULL, 
-			UNIQUE(Code),
-			primary key(Id)
+			UNIQUE KEY UX_Code (Code),
+			PRIMARY KEY  (Id)
 		);";
-	create_table($tablename, $sql, "licensing_version", "0.4");
+	create_table($tablename, $sql, "licensing_version", "0.5.5");
 
 	if ($wpdb->get_var("SELECT COUNT(Code) FROM $tablename") == 0) {
 		$data = array( 

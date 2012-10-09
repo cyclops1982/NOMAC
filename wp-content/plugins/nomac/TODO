@@ -1,4 +1,5 @@
 What to build:
+- Move category widget into nomac plugin
 - Admin function for
 	- Ability to edit frequency table
 	- Ability to edit club table
@@ -8,6 +9,7 @@ What to build:
 
 
 Info:
+http://au.php.net/manual/en/function.filter-var.php
 http://wordpress.org/support/topic/404-pops-after-custom-form-submission-by-post
 http://codex.wordpress.org/Function_Reference/add_shortcode - to register shortcodes.
 http://adambrown.info/p/wp_hooks/hook - all wordpress hooks

@@ -4,36 +4,42 @@ function outputNomacRulechangeList($attrs) {
 	global $wpdb;
 	$out = "";
 	
-	$tLic = $wpdb->prefix . TABLE_RULECHANGE;
+	$tRuleChange = $wpdb->prefix . TABLE_RULECHANGE;
+	$tClass = $wpdb->prefix . TABLE_CLASS;
+
 
 	if (! isset($attrs["year"]) || !is_numeric($attrs["year"])) {
 		$out .= "The nomac rule change list needs a year parameter.";
 		return $out;
 	}
     $year = (int)$attrs["year"];
+
 	
-	$rows = $wpdb->get_results("SELECT LIC.Voornaam, LIC.Achternaam, C.Name AS Klasse, LIC.LidBijClub, LIC.RegistrationDate, LIC.Status FROM $tLic AS LIC INNER JOIN $tClass AS C ON C.Code = LIC.Klasse WHERE Year = $year ORDER BY LIC.Klasse, LIC.RegistrationDate");
+	$rows = $wpdb->get_results("SELECT RC.SubmittedBy, RC.SubmittedOn, C.Name AS Class, RC.Page, RC.Article, RC.OldText, RC.NewText, RC.Comment FROM $tRuleChange AS RC INNER JOIN $tClass AS C ON C.Code = RC.Class WHERE Year = $year ORDER BY C.Code, RC.SubmittedOn");
 	
 	if (count($rows) > 0) {
-		$prevClass = "";
-		$out .= '<table>';
+		$out .= '<table class="nostyle">';
 		foreach ($rows as $row) {
-			if ($prevClass != $row->Klasse) {
-				$out .= '<tr><th colspan="4" class="header">' . $row->Klasse .'</th></tr>';
-				$out .= '<tr><th>Naam</th><th>Klasse</th><th>Club</th><th>Status</th></tr>';
-				$prevClass = $row->Klasse;
-			}
 			$out .= '<tr>';
-			$out .= '<td>' . stripslashes($row->Voornaam) . ' ' . stripslashes($row->Achternaam) . '</td>';
-			$out .= '<td>' . stripslashes($row->Klasse) . '</td>';
-			$out .= '<td>' . stripslashes($row->LidBijClub) . '</td>';
-			$out .= '<td>' . stripslashes($row->Status) . '</td>';
+			$out .= '<th>Ingediend op:</th><td>' . $row->SubmittedOn . '</td>'; // 2
+			$out .= '<th>Klasse:</th><td>' . stripslashes($row->Class) . '</td>';// 2
 			$out .= '</tr>';
+			$out .= '<tr>';
+			$out .= '<th>Pagina:</th><td>' . $row->Page . '</td>'; // 2
+			$out .= '<th>Artikel:</th><td>' . stripslashes($row->Article) . '</td>';// 2
+			$out .= '</tr>';
+			$out .= '<tr><th colspan="4">Oude tekst:</th></tr>';
+			$out .= '<tr><td colspan="4">' . stripslashes($row->OldText) . '</td></tr>';
+			$out .= '<tr><th colspan="4">Nieuwe tekst:</th></tr>';
+			$out .= '<tr><td colspan="4">' . stripslashes($row->NewText) . '</td></tr>';
+			$out .= '<tr><th colspan="4">Uitleg:</th></tr>';
+			$out .= '<tr><td colspan="4">' . stripslashes($row->Comment) . '</td></tr>';
+			$out .= '<tr><th colspan="4" class="header">&nbsp;</th></tr>';
 		}
 		$out .= '</table>';
 	}
 	else {
-		$out .= "Er zijn nog geen aanmeldingen voor het seizoen $year.";
+		$out .= "Er zijn nog geen rgelementswijzigingen voor het seizoen $year.";
 	}
 
 	return $out;

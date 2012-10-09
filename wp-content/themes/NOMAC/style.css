@@ -382,6 +382,7 @@ table.nostyle {
 table.nostyle th,
 table.nostyle td {
 	border-bottom: 1px dashed #a9a9a9;
+	vertical-align: top;
 }
 
 table td {

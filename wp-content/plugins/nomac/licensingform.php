@@ -1,4 +1,7 @@
 <?php
+require_once("validations.php");
+
+
 function outputNomacLicensingForm($attrs) {
 	$out = "";
 	if (! isset($attrs["year"]) || !is_numeric($attrs["year"])) {
@@ -8,7 +11,7 @@ function outputNomacLicensingForm($attrs) {
 	$y = (int)$attrs["year"];
 	
 	if (isset($_REQUEST['submit'])) {
-		$validateItems = ValidateItems($y);
+		$validateItems = licensing_ValidateItems($y);
 		if (count($validateItems) > 0) {
 			$out .= '<ul class="error">';
 			foreach ($validateItems as $valItem) {
@@ -16,26 +19,28 @@ function outputNomacLicensingForm($attrs) {
 			}
 			$out .= '</ul>';
 			$out .= '<br />';
-			$out .= outputForm($y);
+			$out .= licensing_outputForm($y);
 		} else {
-			$bedrag = GetBedrag();
-			$out .= handlePost($y, $bedrag);
+			$bedrag = licensing_GetBedrag();
+			$out .= licensing_handlePost($y, $bedrag);
 		}
 	} else {	
-		$out .= outputForm($y);
+		$out .= licensing_outputForm($y);
 	}
 
 
 	return $out;
 }
-function GetBedrag() {
+
+
+function licensing_GetBedrag() {
 	global $wpdb;
 	$tablename = $wpdb->prefix . TABLE_CLASS;
 	$class = addslashes($_REQUEST['klasse']);
 	return $wpdb->get_var("SELECT Price FROM $tablename WHERE Code = '".$class."';");
 }
 
-function handlePost($yearOfLicense, $bedrag) {
+function licensing_handlePost($yearOfLicense, $bedrag) {
 	global $wpdb;
 	$out  = "";
 	
@@ -110,7 +115,7 @@ function handlePost($yearOfLicense, $bedrag) {
 	return $out;
 }
 
-function GetBinaryContentType($name) {
+function licensing_GetBinaryContentType($name) {
 	if (!isset($_FILES[$name]) || $_FILES[$name]['size'] <= 0 || $_FILES[$name]['error'] != 0) {
 		return NULL;
 	}
@@ -119,7 +124,7 @@ function GetBinaryContentType($name) {
 
 }
 
-function GetBinaryFile($name) {
+function licensing_GetBinaryFile($name) {
 	if (!isset($_FILES[$name]) || $_FILES[$name]['size'] <= 0 || $_FILES[$name]['error'] != 0) {
 		return NULL;
 	}
@@ -132,7 +137,7 @@ function GetBinaryFile($name) {
 	return NULL;
 }
 
-function BuildDate($date) {
+function licensing_BuildDate($date) {
 	$firstDash = strpos($date, "-");
 	$d = substr($date, 0, $firstDash);
 	$m = substr($date, $firstDash + 1, strpos($date, "-", $firstDash));
@@ -141,7 +146,7 @@ function BuildDate($date) {
 	return $y.'-'.$m.'-'.$d;
 }
 
-function ValidateItems($y) {
+function licensing_ValidateItems($y) {
 	global $wpdb;
 
 	// ADd filter date http://au.php.net/manual/en/function.filter-var.php
@@ -280,30 +285,9 @@ function ValidateItems($y) {
 	return $invalidItems;
 }
 
-function RequiredIsSet($name) {
-	if (!isset($_REQUEST[$name])) {
-		return false;
-	}
-	$_REQUEST[$name] = trim($_REQUEST[$name]);
-	if (empty($_REQUEST[$name])) {
-		return false;
-	}
 
-	return true;
-}
 
-function MinLength($name, $length) {
-	if (!isset($_REQUEST[$name])) {
-		return false;
-	}
-	$_REQUEST[$name] = trim($_REQUEST[$name]);
-	if (strlen($_REQUEST[$name]) < $length) {
-		return false;
-	}
-	return true;
-}
-
-function outputForm($y) {
+function licensing_outputForm($y) {
 	$out  = '<form action="' . add_query_arg(array()) .'" method="post" enctype="multipart/form-data">';
 	$out .= '<table class="nostyle">';
 
@@ -430,6 +414,7 @@ function outputForm($y) {
 }
 
 
+
 function outputClassDropdown($controlName, $showDefault = true) {
 	global $wpdb;
 	$tablename = $wpdb->prefix . TABLE_CLASS;
@@ -452,28 +437,5 @@ function outputClassDropdown($controlName, $showDefault = true) {
 	return $out;
 }
 
-
-
-function outputDropdown($tablenameWithoutPrefix, $controlName, $showDefault = true) {
-	global $wpdb;
-	$tablename = $wpdb->prefix . $tablenameWithoutPrefix;
-	
-	$rows = $wpdb->get_results("SELECT Code, Name FROM " . $tablename);
-	$out  = "";
-	$out .= '<select name="' . $controlName . '" >';	
-	if ($showDefault) {
-		$out .= '<option value="" selected="true">Maak een keuze</option>';
-	}
-	foreach ($rows as $row) {
-		if (isset($_REQUEST[$controlName]) && $_REQUEST[$controlName] == $row->Code) {
-			$out .= '<option selected="selected" value="' . $row->Code . '">' . $row->Name . '</option>';
-		} else {
-			$out .= '<option value="' . $row->Code . '">' . $row->Name . '</option>';
-		}
-	}
-	$out .= '</select>';
-
-	return $out;
-}
 
 ?>
