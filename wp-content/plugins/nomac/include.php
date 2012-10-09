@@ -60,8 +60,6 @@ function cleanInput($input, $striptags=false) {
     } else {
 		$input = htmlentities($input, ENT_QUOTES);
 	}
-	$input = mysql_escape_string($input);
-
     return $input;
 }
 

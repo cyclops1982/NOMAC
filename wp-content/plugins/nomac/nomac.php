@@ -32,8 +32,6 @@ add_shortcode('nomac-licensing-list', 'outputNomacLicensingList');
 add_shortcode('nomac-licensing-totals', 'outputNomacLicensingTotals');
 add_shortcode('nomac-rulechange-form', 'outputNomacRulechangeForm');
 add_shortcode('nomac-rulechange-list', 'outputNomacRulechangeList');
-add_shortcode('nomac-rulechange-totals', 'outputNomacRulechangeTotals');
-
 
 
 /* Installation / DB Creation */
@@ -68,6 +66,7 @@ function nomac_add_capabilities() {
 	$role->add_cap(NOMAC_CAP_ADMIN);
 	$role->add_cap(NOMAC_CAP_LICENSING);
 	$role->add_cap(NOMAC_CAP_IMAGECYCLE);
+	$role->add_cap(NOMAC_CAP_RULECHANGE);
 }
 
 function nomac_remove_capabilities() {
@@ -76,6 +75,7 @@ function nomac_remove_capabilities() {
 		$role->remove_cap(NOMAC_CAP_ADMIN);
 		$role->remove_cap(NOMAC_CAP_LICENSING);
 		$role->remove_cap(NOMAC_CAP_IMAGECYCLE);
+		$role->remove_cap(NOMAC_CAP_RULECHANGE);
     }
 }
 
@@ -99,4 +99,11 @@ function nomac_session_start() {
 		session_start();
 	}
 }
+
+
+add_action('admin_head', 'nomac_admin_head');
+function nomac_admin_head() {
+	echo '<link rel="stylesheet" type="text/css" href="' .plugins_url('admin/adminstyle.css', __FILE__). '">';
+}
+
 ?>

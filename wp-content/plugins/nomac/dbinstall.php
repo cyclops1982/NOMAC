@@ -37,6 +37,7 @@ function createRulechangeTable() {
 			OldText MEDIUMTEXT,
 			NewText MEDIUMTEXT,
 			Comment MEDIUMTEXT,
+			Deleted bit(1) NOT NULL DEFAULT 0,
 			PRIMARY KEY  (Id)
 		);";
 	create_table($tablename, $sql, "nomac_rulechange_version", "1.0");

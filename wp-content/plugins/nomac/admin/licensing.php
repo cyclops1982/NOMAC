@@ -6,10 +6,10 @@ function admin_nomac_licensing() {
 
 	$tLic = $wpdb->prefix . TABLE_LICENSING;
 
-        echo '<div class="wrap">';
-        screen_icon('users');
-        echo '<h2>NOMAC Licentie Beheer</h2>';
-        echo '<p>Op deze pagina worden de licenties beheerd. Het beheer kan de status van de licentie aanpassen.</p>';
+	echo '<div class="wrap">';
+	screen_icon('users');
+	echo '<h2>NOMAC Licentie Beheer</h2>';
+	echo '<p>Op deze pagina worden de licenties beheerd. Het beheer kan de status van de licentie aanpassen.</p>';
 
 
 	if (!isset($_SESSION['LIC_YEAR'])) {
@@ -74,8 +74,8 @@ function admin_nomac_licensinglist($year) {
 
 	if (count($rows) > 0) {
 		$out .= '<form method="post" action="">';
-                $prevClass = "";
-                foreach ($rows as $row) {
+		$prevClass = "";
+		foreach ($rows as $row) {
 			$filename = $row['Id'];
 			switch($row['fotoContentType']) {
 				case "image/jpeg": $filename = $filename . ".jpg"; break;
@@ -95,30 +95,30 @@ function admin_nomac_licensinglist($year) {
 			}
 
 
-                        if ($prevClass != $row['ClassName']) {
+			if ($prevClass != $row['ClassName']) {
 				if (!empty($prevClass)) {
 					$out .= '</tbody>';	
-			                $out .= '</table>';
+					$out .= '</table>';
 				}
 				$out .= '<h3>' . $row['ClassName'] . '</h3>';
-                		$out .= '<table class="wp-list-table widefat fixed">';
-                                $out .= '<thead><tr><th>Naam</th><th>Image</th><th>Klasse</th><th>Datum/Tijd</th><th>Status</th></tr></thead>';
+				$out .= '<table class="wp-list-table widefat fixed">';
+				$out .= '<thead><tr><th>Naam</th><th>Image</th><th>Klasse</th><th>Datum/Tijd</th><th>Status</th></tr></thead>';
 				$out .= '<tbody>';
-                                $prevClass = $row['ClassName'];
-                        }
-                        $out .= '<tr>';
+				$prevClass = $row['ClassName'];
+			}
+			$out .= '<tr>';
 			$driverName = stripslashes($row['Voornaam']) . ' ' . stripslashes($row['Achternaam']);
 			$out .= '<input type="hidden" name="DriverName[' . $row['Id'] . ']" value="' . $driverName .'" />';
 			if (!empty($row['Email'])) {
-	                        $out .= '<td><a href="mailto:' . $row['Email'] . '">' .  $driverName . '</td>';
+				$out .= '<td><a href="mailto:' . $row['Email'] . '">' .  $driverName . '</td>';
 			} else {
-	                        $out .= '<td>' . $driverName . '</td>';
+				$out .= '<td>' . $driverName . '</td>';
 			}
 			$path = plugins_url(NOMAC_BASEPATH . "/imagecache/" . $filename, NOMAC_BASEPATH);
 			$out .= '<td><img src="'.$path.'" height="50" /></td>';
-                        $out .= '<td>' . stripslashes($row['ClassName']) . '</td>';
-                        $out .= '<td>' . stripslashes($row['RegistrationDate']) . '</td>';
-                        $out .= '<td>';
+			$out .= '<td>' . stripslashes($row['ClassName']) . '</td>';
+			$out .= '<td>' . stripslashes($row['RegistrationDate']) . '</td>';
+			$out .= '<td>';
 
 			$statusses = Array('Aanvraag ontvangen', 'Betaling ontvangen', 'Betaling onvoldoende', 'Ter goedkeuring bij club', 'Toegekend', 'Afgewezen');
 			$out .= '<select name="status['.$row['Id'].']">';
@@ -131,12 +131,12 @@ function admin_nomac_licensinglist($year) {
 			}
 			$out .= '</select>';
 			$out .= '</td>';
-                        $out .= '</tr>';
-                }
+			$out .= '</tr>';
+		}
 		$out .= '</tbody>';	
-                $out .= '</table>';
+		$out .= '</table>';
 		$out .= '<input type="submit" class="button-primary" name="do" value="Statussen aanpassen" />';
-	$out .= '</form>';
+		$out .= '</form>';
 		
 		// Create CSV file
 		$exportDir = NOMAC_PLUGIN_PATH . "/imagecache/";
@@ -182,35 +182,32 @@ function admin_nomac_licensinglist($year) {
 			$exportUrl = plugins_url(NOMAC_BASEPATH . "/imagecache/" . $exportFileName, NOMAC_BASEPATH);
 			$out .= '<a class="button-secondary" href="'.$exportUrl.'" title="Download export">Exporteren</a>';
 		}
-	
-        }
-        else {
-                $out .= "Er zijn nog geen aanmeldingen voor het seizoen $year.";
-        }
-
-        echo $out;
+	}
+	else {
+		$out .= "Er zijn nog geen aanmeldingen voor het seizoen $year.";
+	}
+	echo $out;
 }
 
 
 
 function admin_nomac_licensingtotals($year) {
 	global $wpdb;
-        $out = "";
+	$out = "";
 
-        $tLic = $wpdb->prefix . TABLE_LICENSING;
-        $tClass = $wpdb->prefix . TABLE_CLASS;
+	$tLic = $wpdb->prefix . TABLE_LICENSING;
+	$tClass = $wpdb->prefix . TABLE_CLASS;
 
-        $counts = $wpdb->get_results("SELECT COUNT(LIC.Id) AS Count, C.Name AS Klasse, LIC.Status FROM $tLic AS LIC INNER JOIN $tClass AS C ON LIC.Klasse = C.Code WHERE Year = $year GROUP BY LIC.Klasse, LIC.Status");
-        if (count($counts) > 0) {
-                $out .= '<table class="wp-list-table widefat fixed">';
-                $out .= '<thead><tr><th>Klasse</th><th>Status</th><th>Aantal</th></tr></thead><tbody>';
-                foreach ($counts as $count) {
-                        $out .= '<tr><td>'.$count->Klasse .'</td><td>'. $count->Status. '</td><td>'.$count->Count.'</td></tr>';
-                }
-                $out .= '</tbody></table>';
-        }
-        else {
-                $out .= "De totalen kunnen niet getoont worden, omdat er nog geen aanmeldingen zijn voor $year";
-        }
+	$counts = $wpdb->get_results("SELECT COUNT(LIC.Id) AS Count, C.Name AS Klasse, LIC.Status FROM $tLic AS LIC INNER JOIN $tClass AS C ON LIC.Klasse = C.Code WHERE Year = $year GROUP BY LIC.Klasse, LIC.Status");
+	if (count($counts) > 0) {
+		$out .= '<table class="wp-list-table widefat fixed">';
+		$out .= '<thead><tr><th>Klasse</th><th>Status</th><th>Aantal</th></tr></thead><tbody>';
+		foreach ($counts as $count) {
+			$out .= '<tr><td>'.$count->Klasse .'</td><td>'. $count->Status. '</td><td>'.$count->Count.'</td></tr>';
+		}
+		$out .= '</tbody></table>';
+	} else {
+		$out .= "De totalen kunnen niet getoont worden, omdat er nog geen aanmeldingen zijn voor $year";
+	}
 	echo $out;
 }

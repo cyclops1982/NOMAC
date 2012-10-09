@@ -15,7 +15,7 @@ function outputNomacRulechangeList($attrs) {
     $year = (int)$attrs["year"];
 
 	
-	$rows = $wpdb->get_results("SELECT RC.SubmittedBy, RC.SubmittedOn, C.Name AS Class, RC.Page, RC.Article, RC.OldText, RC.NewText, RC.Comment FROM $tRuleChange AS RC INNER JOIN $tClass AS C ON C.Code = RC.Class WHERE Year = $year ORDER BY C.Code, RC.SubmittedOn");
+	$rows = $wpdb->get_results("SELECT RC.SubmittedBy, RC.SubmittedOn, C.Name AS Class, RC.Page, RC.Article, RC.OldText, RC.NewText, RC.Comment FROM $tRuleChange AS RC INNER JOIN $tClass AS C ON C.Code = RC.Class WHERE Year = $year AND deleted = 0 ORDER BY C.Code, RC.SubmittedOn");
 	
 	if (count($rows) > 0) {
 		$out .= '<table class="nostyle">';
@@ -39,7 +39,7 @@ function outputNomacRulechangeList($attrs) {
 		$out .= '</table>';
 	}
 	else {
-		$out .= "Er zijn nog geen rgelementswijzigingen voor het seizoen $year.";
+		$out .= "Er zijn nog geen regelementswijzigingen voor het seizoen $year.";
 	}
 
 	return $out;
