@@ -1,0 +1,457 @@
+/*
+Theme Name: NOMAC Website
+Theme URI: http://nomac.nl
+Description: The theme developed for the NOMAC.nl website. Was build by Ruben d'Arco (r.darco@nettrends.nl)
+Version: 1.0
+Tags: NOMAC, R/C racing, R/C, RC, Racing
+*/
+
+
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td { 
+	margin:0;
+	padding:0;
+}
+table {
+	border-collapse:collapse;
+	border-spacing:0;
+}
+fieldset,img { 
+	border:0;
+}
+address,caption,cite,code,dfn,em,strong,th,var {
+	font-style:normal;
+	font-weight:normal;
+}
+ol,ul {
+	list-style:none;
+}
+caption,th {
+	text-align:left;
+}
+h4,h5,h6 {
+	font-size:100%;
+	font-weight:normal;
+}
+q:before,q:after {
+	content:'';
+}
+abbr,acronym { 
+	border:0;
+}
+
+.orange {
+	color: #ef7b23;
+}
+ 
+body {
+	font-family: Arial, Helvetica, Sans-Serif;
+	font-size: 12px;
+	color: #000;
+	background: url('images/NomacBG.gif');
+	background-repeat:no-repeat;
+	background-attachment:fixed;
+	background-position:center top; 
+	background-color: #000;
+}
+
+strong {
+	font-weight: bold;
+}
+cite, em, i {
+	font-style:italic;
+}
+
+a,
+a:hover,
+a:active,
+a:focus, 
+a:link {
+	text-decoration: underline;
+	color: #333;
+}
+
+a:visited {
+	text-decoration: dotted;
+	color: #333;
+}
+
+
+h1 a,
+h2 a,
+h3 a,
+h4 a {
+	text-decoration: none !important;
+}
+
+h1 {
+	border-bottom: 3px solid #F78F20;
+	padding: 1px 5px 0px 0;
+	margin-bottom: 0em;
+	font-size: 2em;
+	font-weight: normal;
+}
+
+
+
+h2 {
+	padding-top: 1.5em;
+	border-bottom: 2px solid #F87F20;
+	margin-bottom: 3px;
+	font-size: 1.4em;
+	font-weight: bold;
+}
+
+h3 {
+	border-bottom: 1px solid #F87F20;
+	padding-top: 1.2em;
+	font-weight: bold;
+}
+
+h4 {
+	font-weight: bold;
+	text-decoration:underline;
+}
+
+.maxwidth {
+	width: 960px;
+	margin: 0 auto;
+}
+
+div.leftside {
+	float: left;
+	width: 660px;
+}
+
+
+div.sidebar {
+	float: right;
+	width: 250px;
+	margin: 0px 16px 16px 16px;
+	padding: 4px;
+	background-color: #c9c9cb;
+	color: #000;
+}
+
+.content {
+	margin-left: 16px;
+	clear: both;
+}
+
+
+.paging {
+	margin-top: 1em;
+	margin-bottom: 1em;
+	margin-left: auto;
+	margin-right: auto;
+	clear: both;
+}
+.paging span {
+	margin-right: 2em;
+}
+.paging a {
+	line-height: 1em;
+	padding: 0 0.4em;
+	border: 1px solid black;
+	margin: 0.3em;
+	text-decoration: none;
+}
+.paging a.current {
+	background-color:#c0c0c0;
+}
+
+.contentbg {
+	background-color: #fff;
+}
+
+.top {
+	height: 112px;
+	background: url('images/Header.jpg') no-repeat;
+}
+
+.navigation {
+	height: 33px;
+	line-height: 33px;
+	border-bottom: 2px solid black;
+	margin-bottom: 1em;
+}
+
+li a:link,
+li a:visited
+{
+	color: #000;
+}
+
+li a:active, 
+li a:hover {
+	color: #F87F20;
+}
+
+li.selected > a
+{
+	color: #fff;
+}
+
+#searchbox {
+	float: right;
+	font-size: 1.2em;
+	font-weight: bold;
+	line-height: 30px;
+	padding-right: 1em;
+}
+
+ul.headermenu li a {
+	padding: 0em 1em 0em 1em;
+	text-decoration: none;
+}
+
+ul.headermenu li {
+	border-right: 1px solid #000;
+	float: left;
+	font-weight: bold;
+	font-size: 1.2em;
+	background-color: #e9e9e9; 
+}
+
+
+ul.headermenu li.selected,
+ul.pagemenu li.selected {
+	background-color: #F87F20;
+}
+
+ul.pagemenu li.selected {
+	border-left: 1px solid #000;
+	border-right: 1px solid #000;
+}
+
+.subnavigation {
+	line-height: 23px;
+	height: 23px;
+	margin-bottom: 1em;
+	width: 645px;
+	background-color: #e9e9e9;
+}
+
+ul.pagemenu li a
+{
+	padding: 0em 0.5em 0em 0.5em;
+	text-decoration: none;
+	font-weight: bold; 
+}
+
+
+ul.pagemenu li {
+	float: left;
+	background-color: #e9e9e9;
+}
+
+ul.submenu {
+	display: none;
+	position: absolute;
+	background-color: #c9c9cb;
+	z-index:200;
+	border-left: 1px solid #000;
+	border-right: 1px solid #000;
+	border-top: 1px solid #000;
+}
+
+
+ul.submenu li {
+	line-height: 23px;
+	float:left;
+	clear:left;
+	border: 0px;
+	font-size: 0.9em;
+	width: 100%;
+	border-bottom: 1px solid #000;
+}
+
+ul.headermenu li:hover ul.submenu {
+	display:block;
+}
+
+
+
+.footer {
+	clear: both;
+	background-color: #c9c9cb;
+	text-align: center;
+}
+
+
+
+.post {
+	margin-bottom: 2em;
+}
+
+div.page ul,
+div.post ul
+{
+	list-style:circle;
+	list-style-position:inside;
+}
+
+div.page ol,
+div.post ol
+{
+	list-style: decimal;
+	list-style-position:inside;
+}
+
+
+
+.postdata {
+	font-size: 0.8em;
+	color: #aaa;
+	text-align: right;
+}
+
+
+.postsummary {
+	float: left;
+	padding: 0px 10px 0px 0px;
+	width: 645px;
+}
+
+.postsummary img {
+	border:1px solid black;
+}
+
+.postsummary img.leftimg {
+	margin-right: 8px;
+}
+.postsummary img.rightimg {
+	margin-left: 8px;
+}
+
+.postmeta {
+	font-size: 0.8em;
+	color: #999;
+	overflow: hidden;
+}
+
+.postmeta a {
+	color:#999;
+}
+
+.post .postmeta, 
+.page .postmeta {
+	margin-bottom: 1em;	
+}
+
+
+.postcontent {
+	padding-top: 0.4em;
+}
+
+
+
+span.readmore {
+	float:right;
+}
+
+
+
+div.comments p.nocomments {
+	padding-top: 1em;
+	padding-bottom: 1em;
+}
+
+div.comments h3 {
+	font-size: 1.2em;
+	font-weight: bold;
+}
+
+
+img.aligncenter {
+	margin: 1em auto 1em auto;
+	display: block;
+}
+
+img {
+}
+
+table.nostyle thead,
+table.nostyle th,
+table.nostyle td,
+table.nostyle {
+	border: 0px;
+	padding: 0.2em;
+	background-color: #fff;
+}
+
+table.nostyle th,
+table.nostyle td {
+	border-bottom: 1px dashed #a9a9a9;
+}
+
+table td {
+	border-bottom: 1px solid #a9a9a9;
+	border-left: 1px dashed #a9a9a9;
+	border-right: 1px dashed #a9a9a9;
+	padding: 0.2em;
+}
+
+table thead,
+table th {
+	background-color: #a9a9a9;
+	border-bottom: 2px solid #F78F20;
+	padding: 0.3em;
+	font-weight: bold;
+}
+th.header {
+	padding-top: 1em;
+	border-bottom: 0px;
+	background-color: #fff;
+}
+
+
+.ImageCycle {
+	margin: auto 
+}
+.ImageCycle img 
+{
+	padding: 0;
+}
+
+div.ImageCycle {
+	height: 275px;
+}
+
+.gallery {
+	margin: 1em 0;
+}
+
+.gallery a img {
+	border:1px solid black;
+}
+
+.gallery-caption {
+	font-size: 0.9em;
+}
+.gallery-columns-1 .gallery-item {
+	width: 100%;
+}
+
+.gallery-columns-2 .gallery-item {
+	width: 50%;
+}
+
+.gallery-columns-3 .gallery-item {
+	width: 33%;
+}
+
+.gallery-columns-4 .gallery-item {
+	width: 25%;
+}
+
+.gallery-item {
+	float: left;
+	text-align: center;
+	display:inline;
+	margin: 1em 0;
+}
+
+
+.error {
+	color: red;
+}
