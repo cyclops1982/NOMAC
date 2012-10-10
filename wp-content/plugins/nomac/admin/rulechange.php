@@ -87,11 +87,11 @@ function admin_nomac_rulechangelist($year) {
 			$out .= '<th>Artikel:</th><td>' . stripslashes($row->Article) . '</td>';// 2
 			$out .= '</tr>';
 			$out .= '<tr><th colspan="4">Oude tekst:</th></tr>';
-			$out .= '<tr><td colspan="4">' . stripslashes($row->OldText) . '</td></tr>';
+			$out .= '<tr><td colspan="4">' . cleanOutput($row->OldText) . '</td></tr>';
 			$out .= '<tr><th colspan="4">Nieuwe tekst:</th></tr>';
-			$out .= '<tr><td colspan="4">' . stripslashes($row->NewText) . '</td></tr>';
+			$out .= '<tr><td colspan="4">' . cleanOutput($row->NewText) . '</td></tr>';
 			$out .= '<tr><th colspan="4">Uitleg:</th></tr>';
-			$out .= '<tr><td colspan="4">' . stripslashes($row->Comment) . '</td></tr>';
+			$out .= '<tr><td colspan="4">' . cleanOutput($row->Comment) . '</td></tr>';
 		}
 		$out .= '</table>';
 		$out .= '<input type="submit" class="button-primary" name="do" value="Aangevinkte items verwijderen" />';

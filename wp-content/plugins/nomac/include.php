@@ -63,6 +63,12 @@ function cleanInput($input, $striptags=false) {
     return $input;
 }
 
+function cleanOutput($out) {
+	$out = stripslashes($out);
+	$out = str_replace("\n", "<br />", $out);
+	return $out;
+}
+
 
 function outputDropdown($tablenameWithoutPrefix, $controlName, $showDefault = true) {
 	global $wpdb;
