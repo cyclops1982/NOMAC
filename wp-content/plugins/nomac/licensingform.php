@@ -176,11 +176,8 @@ function licensing_ValidateItems($y) {
 	if (! RequiredIsSet('postcode') ) {
 		$invalidItems[] = "Postcode is een verplicht veld.";
 	} else if (! MinLength('postcode', 6)) {
-		$invalidItems[] = "Postcode moet 4 cijfers en 2 letters hebben.";
-	} else if (preg_match("/^[0-9]{4}\s{0,1}[a-z]{2}$/i", $_REQUEST['postcode']) == 0) {
-		$invalidItems[] = "Dit is geen geldige postcode. Moet 4 cijfers zijn met 2 letters er achter.";
+		$invalidItems[] = "Postcode moet uit minimaal 6 tekens bestaan.";
 	}
-	
 
 	if (! RequiredIsSet('woonplaats') ) {
 		$invalidItems[] = "Woonplaats is een verplicht veld.";
