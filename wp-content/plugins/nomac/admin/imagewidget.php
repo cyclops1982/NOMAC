@@ -76,7 +76,6 @@ function admin_nomac_imagecycle_outputform($row)
 	
 	echo '<form method="post" action="">';
 	?>
-	<form>
 		<table>
 			<tr>
 				<td>Title (alt text):</td>
@@ -109,7 +108,6 @@ function admin_nomac_imagecycle_outputform($row)
 			
 	
 		</table>
-	</form>	
 	<?php
 	echo '</form>';
 }
