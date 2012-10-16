@@ -1,0 +1,9 @@
+/* Admin style */
+
+
+
+table.left th,
+table.left td
+{
+	text-align: left;
+}
