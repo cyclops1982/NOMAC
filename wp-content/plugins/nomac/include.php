@@ -20,6 +20,7 @@ DEFINE('NOMAC_CAP_RULECHANGE', 'Nomac Reglementswijzigingen Admin');
 DEFINE('NOMAC_CAP_IMAGECYCLE', 'Nomac Image Cycle Admin');
 DEFINE('NOMAC_CAP_FREQUENCY', 'Nomac Frequncy Admin');
 DEFINE('NOMAC_CAP_CLUB', 'Nomac Club Admin');
+DEFINE('NOMAC_CAP_CLASS', 'Nomac Class Admin');
 
 
 DEFINE('NOMAC_PLUGIN_PATH', WP_PLUGIN_DIR . "/" . basename(dirname(__FILE__)));
