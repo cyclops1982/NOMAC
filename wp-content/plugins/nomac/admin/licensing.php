@@ -89,9 +89,15 @@ function admin_nomac_licensinglist($year) {
 			}
 			$fullpath = NOMAC_PLUGIN_PATH . "/imagecache/" . $filename;
 			if ( ! file_exists($fullpath)) {
-				$fp = fopen($fullpath, "wb");
-				fwrite($fp, stripslashes($row['foto']));
-				fclose($fp);
+				$fp = @fopen($fullpath, "wb");
+				if ($fp === FALSE) {
+					$out .= 'ERROR, COULD NOT CREATE IMAGECACHE FILE!';
+					echo $out;
+					return;
+				} else {
+					fwrite($fp, stripslashes($row['foto']));
+					fclose($fp);
+				}
 			}
 
 
@@ -138,8 +144,19 @@ function admin_nomac_licensinglist($year) {
 		$out .= '<input type="submit" class="button-primary" name="do" value="Statussen aanpassen" />';
 		$out .= '</form>';
 		
-		// Create CSV file
+		
 		$exportDir = NOMAC_PLUGIN_PATH . "/imagecache/";
+		// Delete old files
+		$dir = dir($exportDir);
+		while (false !== ($entry = $dir->read())) {
+			if (substr($entry, -4) == ".csv" || substr($entry, -4) == ".zip") {
+				$delFile = $exportDir . $entry;
+				unlink($delFile);
+			}
+		}
+
+
+		// Create CSV file
 		$exportFileName = $exportDir . "Drivers".date('Y-m-d').".csv";
 		$fp = fopen($exportFileName, "w");
 		if ($fp === FALSE) {
