@@ -26,6 +26,7 @@ require_once("admin/licensing.php");
 require_once("admin/rulechange.php");
 require_once("admin/imagewidget.php");
 require_once("admin/frequency.php");
+require_once("admin/club.php");
 
 
 /* ShortCodes for the specific forms */
@@ -70,6 +71,7 @@ function nomac_add_capabilities() {
 	$role->add_cap(NOMAC_CAP_IMAGECYCLE);
 	$role->add_cap(NOMAC_CAP_RULECHANGE);
 	$role->add_cap(NOMAC_CAP_FREQUENCY);
+	$role->add_cap(NOMAC_CAP_CLUB);
 }
 
 
@@ -81,6 +83,7 @@ function nomac_remove_capabilities() {
 		$role->remove_cap(NOMAC_CAP_IMAGECYCLE);
 		$role->remove_cap(NOMAC_CAP_RULECHANGE);
 		$role->remove_cap(NOMAC_CAP_FREQUENCY);
+		$role->remove_cap(NOMAC_CAP_CLUB);
     }
 }
 
@@ -97,6 +100,7 @@ function nomac_admin_menu() {
 	add_submenu_page("NOMAC", "Reglementswijzigingen beheer", "Reglementswijzigingen beheer", NOMAC_CAP_RULECHANGE, "Reglementswijzigingen", "admin_nomac_rulechange");
 	add_submenu_page("NOMAC", "Image Cycle", "Image Cycle", NOMAC_CAP_IMAGECYCLE, "ImageCycle", "admin_nomac_imagecycle");
 	add_submenu_page("NOMAC", "Frequenties", "Frequenties", NOMAC_CAP_FREQUENCY, "Frequency", "admin_nomac_frequency");
+	add_submenu_page("NOMAC", "Clubs", "Clubs", NOMAC_CAP_CLUB, "Club", "admin_nomac_club");
 }
 
 
