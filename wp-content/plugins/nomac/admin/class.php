@@ -13,9 +13,16 @@ function admin_nomac_class() {
 
 
 	if (isset($_POST['add'])) {
-		echo "Adding klasse...";
+		echo '<pre>';
+		print_r($_POST);
+		echo '</pre>';
+		echo 'Adding klasse...';
 		$data['Code'] = $_POST['code'];
 		$data['Name'] = $_POST['name'];
+		$data['CloseDate'] = $_POST['closedate'];
+		$data['MaxDrivers'] = $_POST['maxdrivers'];
+		$data['MaxDriversCloseDate'] = $_POST['maxdriversclosedate'];
+		$data['Price'] = $_POST['price'];
 		$wpdb->insert($tablename, $data);
 	}
 
@@ -26,16 +33,24 @@ function admin_nomac_class() {
 	}
 
 	if (isset($_POST['update'])) {
+		echo '<pre>';
+		print_r($_POST);
+		echo '</pre>';
+
 		echo "Updating klasse name....";
 		$data['Name'] = $_POST['name'];
+		$data['CloseDate'] = $_POST['closedate'];
+		$data['MaxDrivers'] = $_POST['maxdrivers'];
+		$data['MaxDriversCloseDate'] = $_POST['maxdriversclosedate'];
+		$data['Price'] = $_POST['price'];
 		$id['Id'] = $_POST['id'];
 		$wpdb->update($tablename, $data, $id);
 	}
 
-	$frequencies = $wpdb->get_results("SELECT Id, Code, Name FROM ".$tablename);
+	$frequencies = $wpdb->get_results("SELECT Id, Code, Name, CloseDate, MaxDrivers, MaxDriversCloseDate, Price FROM ".$tablename);
 	if (count($frequencies) > 0) {
 		echo '<table class="wp-list-table widefat">';
-		echo '<thead><tr><th>Code</th><th>Name</th><th>Action</th></tr></thead>';
+		echo '<thead><tr><th>Code</th><th>Name</th><th>Close Date</th><th>Max Drivers</th><th>Max Drivers Close Date</th><th>Price</th><th>Action</th><th></th></tr></thead>';
 		echo '<tbody>';
 		foreach ($frequencies as $freq)
 		{
@@ -52,13 +67,15 @@ function admin_nomac_class() {
 function admin_nomac_class_outputform($row)
 {
 	if (!isset($row)) {
+		$row->Id = 0;
 		$row->Code = "";
 		$row->Name = "";
-		$row->Id = 0;
+		$row->CloseDate = "";
+		$row->MaxDrivers = 0;
+		$row->MaxDriversCloseDate = "";
+		$row->Price = 100;
 	}
-
 	?>
-	
 	<form method="post" action="">
 		<tr>
 			<?php if ($row->Id != 0) { ?>
@@ -66,15 +83,22 @@ function admin_nomac_class_outputform($row)
 			<?php } else { ?>
 				<td><input type="text" name="code" value="<?php echo $row->Code; ?>" size="10"/></td>
 			<?php } ?>
-			<td><input type="text" name="name" value="<?php echo $row->Name; ?>" size="100" /></td>
+			<td><input type="text" name="name" value="<?php echo $row->Name; ?>" size="70" /></td>
+			<td><input type="text" name="closedate" value="<?php echo $row->CloseDate; ?>" size="10" /></td>
+			<td><input type="text" name="maxdrivers" value="<?php echo $row->MaxDrivers; ?>" size="3" /></td>
+			<td><input type="text" name="maxdriversclosedate" value="<?php echo $row->MaxDriversCloseDate; ?>" size="10" /></td>
+			<td><input type="text" name="price" value="<?php echo $row->Price; ?>" size="3" /></td>
 			<?php if ($row->Id != 0) { ?>
 				<td>
 					<input type="hidden" name="id" value="<?php echo $row->Id; ?>" />
 					<input type="submit" class="button-primary" name="update" value="Save" />
+				</td>
+				<td>
+					<input type="hidden" name="id" value="<?php echo $row->Id; ?>" />
 					<input type="submit" class="button-secondary" name="delete" value="Delete" />
 				</td>
 			<?php } else { ?>
-				<td>
+				<td colspan="2">
 					<input type="submit" class="button-primary" name="add" value="Add" />
 				</td>
 			<?php } ?>	

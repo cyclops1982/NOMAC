@@ -104,7 +104,7 @@ function nomac_admin_menu() {
 	add_submenu_page("NOMAC", "Image Cycle", "Image Cycle", NOMAC_CAP_IMAGECYCLE, "ImageCycle", "admin_nomac_imagecycle");
 	add_submenu_page("NOMAC", "Frequenties", "Frequenties", NOMAC_CAP_FREQUENCY, "Frequency", "admin_nomac_frequency");
 	add_submenu_page("NOMAC", "Clubs", "Clubs", NOMAC_CAP_CLUB, "Club", "admin_nomac_club");
-	add_submenu_page("NOMAC", "Klasses", "Classes", NOMAC_CAP_CLASS, "Class", "admin_nomac_class");
+	add_submenu_page("NOMAC", "Klassen", "Klassen", NOMAC_CAP_CLASS, "Class", "admin_nomac_class");
 }
 
 
