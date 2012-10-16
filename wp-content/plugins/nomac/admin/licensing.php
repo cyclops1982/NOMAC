@@ -1,4 +1,4 @@
-<?
+<?php
 
 
 function admin_nomac_licensing() {
@@ -211,3 +211,6 @@ function admin_nomac_licensingtotals($year) {
 	}
 	echo $out;
 }
+
+
+?>

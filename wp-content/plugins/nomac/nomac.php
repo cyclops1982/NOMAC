@@ -25,8 +25,10 @@ require_once("admin/nomac.php");
 require_once("admin/licensing.php");
 require_once("admin/rulechange.php");
 require_once("admin/imagewidget.php");
+require_once("admin/frequency.php");
 
 
+/* ShortCodes for the specific forms */
 add_shortcode('nomac-licensing-form', 'outputNomacLicensingForm');
 add_shortcode('nomac-licensing-list', 'outputNomacLicensingList');
 add_shortcode('nomac-licensing-totals', 'outputNomacLicensingTotals');
@@ -67,7 +69,9 @@ function nomac_add_capabilities() {
 	$role->add_cap(NOMAC_CAP_LICENSING);
 	$role->add_cap(NOMAC_CAP_IMAGECYCLE);
 	$role->add_cap(NOMAC_CAP_RULECHANGE);
+	$role->add_cap(NOMAC_CAP_FREQUENCY);
 }
+
 
 function nomac_remove_capabilities() {
 	$role = get_role('administrator');
@@ -76,8 +80,13 @@ function nomac_remove_capabilities() {
 		$role->remove_cap(NOMAC_CAP_LICENSING);
 		$role->remove_cap(NOMAC_CAP_IMAGECYCLE);
 		$role->remove_cap(NOMAC_CAP_RULECHANGE);
+		$role->remove_cap(NOMAC_CAP_FREQUENCY);
     }
 }
+
+
+
+
 
 
 /* Admin menu/pages */ 
@@ -87,6 +96,7 @@ function nomac_admin_menu() {
 	add_submenu_page("NOMAC", "Licentie beheer", "Licentie beheer", NOMAC_CAP_LICENSING, "Licensing", "admin_nomac_licensing");
 	add_submenu_page("NOMAC", "Reglementswijzigingen beheer", "Reglementswijzigingen beheer", NOMAC_CAP_RULECHANGE, "Reglementswijzigingen", "admin_nomac_rulechange");
 	add_submenu_page("NOMAC", "Image Cycle", "Image Cycle", NOMAC_CAP_IMAGECYCLE, "ImageCycle", "admin_nomac_imagecycle");
+	add_submenu_page("NOMAC", "Frequenties", "Frequenties", NOMAC_CAP_FREQUENCY, "Frequency", "admin_nomac_frequency");
 }
 
 

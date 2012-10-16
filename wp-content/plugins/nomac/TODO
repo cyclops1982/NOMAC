@@ -1,11 +1,12 @@
 What to build:
-- Move category widget into nomac plugin
+
+- Clean up old files in licensing admin
 - Admin function for
-	- Ability to edit frequency table
 	- Ability to edit club table
 	- Ability to edit Class table
 - Extra veld voor transponder
 - Belgen en hun postcode
+- Move category widget into nomac plugin
 
 
 Info:

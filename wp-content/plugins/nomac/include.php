@@ -18,6 +18,7 @@ DEFINE('NOMAC_CAP_ADMIN', 'Nomac Admin');
 DEFINE('NOMAC_CAP_LICENSING', 'Nomac Licensing Admin');
 DEFINE('NOMAC_CAP_RULECHANGE', 'Nomac Reglementswijzigingen Admin');
 DEFINE('NOMAC_CAP_IMAGECYCLE', 'Nomac Image Cycle Admin');
+DEFINE('NOMAC_CAP_FREQUENCY', 'Nomac Frequncy Admin');
 
 
 DEFINE('NOMAC_PLUGIN_PATH', WP_PLUGIN_DIR . "/" . basename(dirname(__FILE__)));
