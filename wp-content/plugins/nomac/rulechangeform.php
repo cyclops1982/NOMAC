@@ -8,10 +8,21 @@ function outputNomacRulechangeForm($attrs) {
 		$out .= "The nomac rule change form needs a year parameter.";
 		return $out;
 	}
-	$y = (int)$attrs["year"];
-	
+	if (! isset($attrs["closedate"]) || strtotime($attrs["closedate"]) == false) {
+		$out .= "The nomac rule change form needs a closedate parameter. (Something accepted by date_parse() - http://php.net/manual/en/function.date-parse.php)";
+		return $out;
+	}
+	$closedate = strtotime($attrs["closedate"]) - 3600; // adjust for gmt+1
+
+	if (time() > $closedate) {
+		$out .= "Het indienen van reglemenswijzigingen is gesloten.<br />";
+		return $out;
+	}
+
+	$year = (int)$attrs["year"];
+		
 	if (isset($_REQUEST['submit'])) {
-		$validateItems = rulechange_ValidateItems($y);
+		$validateItems = rulechange_ValidateItems($year, strtotime($attrs["closedate"]));
 		if (count($validateItems) > 0) {
 			$out .= '<ul class="error">';
 			foreach ($validateItems as $valItem) {
@@ -19,12 +30,12 @@ function outputNomacRulechangeForm($attrs) {
 			}
 			$out .= '</ul>';
 			$out .= '<br />';
-			$out .= rulechange_outputForm($y);
+			$out .= rulechange_outputForm($year);
 		} else {
-			$out .= rulechange_handlePost($y);
+			$out .= rulechange_handlePost($year);
 		}
 	} else {	
-		$out .= rulechange_outputForm($y);
+		$out .= rulechange_outputForm($year);
 	}
 	return $out;
 }
@@ -91,10 +102,17 @@ function rulechange_handlePost($yearOfLicense) {
 }
 
 
-function rulechange_ValidateItems($y) {
+function rulechange_ValidateItems($y, $closedate) {
 	global $wpdb;
 
 	$invalidItems = array();
+	
+
+
+	if (time() > $closedate) {
+		$invalidItems[] = "Je bent te laat met het indienen van je voorstel. Het indienen is gesloten.";
+	}
+
 	if (! RequiredIsSet('SubmittedBy') ) {
 		$invalidItems[] = "'Ingediend door' is een verplicht veld.";
 	} else if (! MinLength('SubmittedBy', 5)) {
