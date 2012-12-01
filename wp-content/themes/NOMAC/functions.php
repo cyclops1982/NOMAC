@@ -169,7 +169,7 @@ function improved_trim_excerpt($text) {
                 $text = str_replace('\]\]\>', ']]&gt;', $text);
                 $text = preg_replace('@<script[^>]*?>.*?</script>@si', '', $text);
                 $text = strip_tags($text, '<a>');
-                $excerpt_length = theme_excerpt_length();
+                $excerpt_length = theme_excerpt_length("60");
                 $words = explode(' ', $text, $excerpt_length + 1);
                 if (count($words)> $excerpt_length) {
                         array_pop($words);

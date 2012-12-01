@@ -1,5 +1,43 @@
 /* Admin style */
 
+@media print {
+	body { background:white; color:black; margin:0 }
+	#adminmenuwrap, 
+	#adminmenuback {
+		display: none;
+	}
+
+	.pagebreak {
+		page-break-before: always;
+	}
+
+	.noprint {
+		display: none;
+	}
+	.print {
+		display: block;
+	}
+
+	#adminmenu {
+		display: block;
+	}
+
+	#adminmenuback, #adminmenuwrap, #adminmenu, #adminmenu .wp-submenu, #adminmenu .wp-submenu-wrap, .folded #adminmenu .wp-has-current-submenu .wp-submenu {
+    width: 0px;
+}
+
+	#adminmenuback, #adminmenuwrap, #adminmenu, #adminmenu .wp-submenu, #adminmenu .wp-submenu-wrap, .wp-submenu {
+    	width: 0px;
+    	min-width: 0em;
+	}
+
+
+	#wpbody {
+		left: 0;
+		position: absolute;
+	}
+
+}
 
 
 table.left th,

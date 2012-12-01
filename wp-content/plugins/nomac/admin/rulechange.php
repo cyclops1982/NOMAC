@@ -36,7 +36,7 @@ function admin_nomac_rulechange() {
 
 	$yearQuery = "SELECT year FROM $tRuleChange GROUP BY year";
 	$years = $wpdb->get_results($yearQuery);
-	echo '<form method="post" action="">';
+	echo '<form method="post" class="noprint" action="">';
 	echo 'Selecteer een jaar/seizoen: ';
 	echo '<select name="year">';
 	foreach ($years as $y) {
@@ -70,10 +70,18 @@ function admin_nomac_rulechangelist($year) {
 	
 
 	if (count($rows) > 0) {
-		$out .= '<form method="post" action="">';
-		$out .= '<table class="wp-list-table left">';
+		$out .= '<form method="post" action="">';		
 		foreach ($rows as $row) {
-			$out .= '<tr><th colspan="1">Verwijderen:</th><td colspan="3"><input type="checkbox" name="delete['.$row->Id.']" /></td></tr>'; //4
+			if ($row->Class != $class) {
+				if ($class != "") {
+					$out .= "</table>";
+				}
+				$class = $row->Class;
+				$out .= '<h3 class="pagebreak">' . stripslashes($row->Class) . '</h3>';
+				
+			}
+			$out .= '<table class="wp-list-table left">';
+			$out .= '<tr class="noprint"><th colspan="1">Verwijderen:</th><td colspan="3"><input type="checkbox" name="delete['.$row->Id.']" /></td></tr>'; //4
 			$out .= '<tr>';
 			$out .= '<th>Ingediend door:</th><td>' . stripslashes($row->SubmittedBy) . '</td>'; // 2
 			$out .= '<th>E-mail:</th><td>' . stripslashes($row->SubmitterEmail) . '</td>';// 2
@@ -92,9 +100,10 @@ function admin_nomac_rulechangelist($year) {
 			$out .= '<tr><td colspan="4">' . cleanOutput($row->NewText) . '</td></tr>';
 			$out .= '<tr><th colspan="4">Uitleg:</th></tr>';
 			$out .= '<tr><td colspan="4">' . cleanOutput($row->Comment) . '</td></tr>';
+			$out .= "</table>";
 		}
-		$out .= '</table>';
-		$out .= '<input type="submit" class="button-primary" name="do" value="Aangevinkte items verwijderen" />';
+		
+		$out .= '<input type="submit" class="button-primary noprint" name="do" value="Aangevinkte items verwijderen" />';
 		$out .= '</form>';
 
 	}

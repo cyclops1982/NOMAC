@@ -1,0 +1,30 @@
+/*
+Theme Name: NOMAC Website
+Theme URI: http://nomac.nl
+Description: The theme developed for the NOMAC.nl website. Was build by Ruben d'Arco (r.darco@nettrends.nl)
+Version: 1.0
+Tags: NOMAC, R/C racing, R/C, RC, Racing
+*/
+
+
+@media print {
+	body { background:white; color:black; margin:0 }
+	#header { display: none; }
+	#content { display: none;  }
+	#comments { display: none;  }
+	#sidebar { display: none;  }
+	.sidebar { display: none; }
+	.top { display: none; }
+	.navigation {display: none; }
+	#footer { display: none;  }
+
+	h3.pagebreak {
+		page-break-before: always;
+	}
+
+
+}
+
+.error {
+	color: red;
+}
