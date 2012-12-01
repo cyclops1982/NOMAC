@@ -11,6 +11,10 @@
 		page-break-before: always;
 	}
 
+	.breakafter {
+		page-break-after: always;
+	}
+
 	.noprint {
 		display: none;
 	}

@@ -22,6 +22,7 @@ function outputNomacRulechangeList($attrs) {
 	if (count($rows) > 0) {
 		
 		$class = "";
+		$i = 0;
 		foreach ($rows as $row) {
 			if ($row->Class != $class) {
 				if ($class != "") {
@@ -30,7 +31,12 @@ function outputNomacRulechangeList($attrs) {
 				$class = $row->Class;
 				$out .= '<h3 class="pagebreak">' . stripslashes($row->Class) . '</h3>';
 				$out .= '<table class="nostyle">';
+				$i=0;
 			}
+			$i++;
+			$out .= '<tr>';
+			$out .= '<th>Voorstel nummer:</th><td>' . $i . '</td>'; // 2
+			$out .= '</tr>';
 			$out .= '<tr>';
 			$out .= '<th>Ingediend op:</th><td>' . $row->SubmittedOn . '</td>'; // 2
 			$out .= '<th>Klasse:</th><td>' . stripslashes($row->Class) . '</td>';// 2

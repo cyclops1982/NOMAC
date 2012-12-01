@@ -70,18 +70,25 @@ function admin_nomac_rulechangelist($year) {
 	
 
 	if (count($rows) > 0) {
+		$i = 0;
 		$out .= '<form method="post" action="">';		
 		foreach ($rows as $row) {
 			if ($row->Class != $class) {
 				if ($class != "") {
 					$out .= "</table>";
 				}
+				$i=0;
 				$class = $row->Class;
 				$out .= '<h3 class="pagebreak">' . stripslashes($row->Class) . '</h3>';
 				
+			} else {
+				$out .= '<br />';
 			}
+			$i++;
+
 			$out .= '<table class="wp-list-table left">';
 			$out .= '<tr class="noprint"><th colspan="1">Verwijderen:</th><td colspan="3"><input type="checkbox" name="delete['.$row->Id.']" /></td></tr>'; //4
+			$out .= '<tr><th>Voorstel nummer:</th><td colspan="3">' . $i . '</td></tr>'; 
 			$out .= '<tr>';
 			$out .= '<th>Ingediend door:</th><td>' . stripslashes($row->SubmittedBy) . '</td>'; // 2
 			$out .= '<th>E-mail:</th><td>' . stripslashes($row->SubmitterEmail) . '</td>';// 2
