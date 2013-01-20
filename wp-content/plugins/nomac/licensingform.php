@@ -53,7 +53,7 @@ function licensing_handlePost($yearOfLicense, $bedrag) {
 	$insertData['HuisNr'] = strip_tags($_REQUEST['huisnr']);
 	$insertData['PostCode'] = strip_tags($_REQUEST['postcode']);
 	$insertData['Woonplaats'] = strip_tags($_REQUEST['woonplaats']);
-	$insertData['GeboorteDatum'] = BuildDate($_REQUEST['geboortedatum']);
+	$insertData['GeboorteDatum'] = licensing_BuildDate($_REQUEST['geboortedatum']);
 	$insertData['TelefoonNr'] = strip_tags($_REQUEST['telefoonnr']);
 	$insertData['Email'] = strip_tags($_REQUEST['email']);
 	$insertData['LidBijClub'] = strip_tags($_REQUEST['lidbijclub']);
