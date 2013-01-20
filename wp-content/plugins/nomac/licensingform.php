@@ -66,8 +66,8 @@ function licensing_handlePost($yearOfLicense, $bedrag) {
 	$insertData['Status'] = 'Aanvraag ontvangen'; 
 	$insertData['year'] = $yearOfLicense;
 	$insertData['RegistrationDate'] = date('Y-m-d H:i:s');
-	$insertData['foto'] = GetBinaryFile('foto'); 
-	$insertData['fotoContentType'] = GetBinaryContentType('foto');
+	$insertData['foto'] = licensing_GetBinaryFile('foto'); 
+	$insertData['fotoContentType'] = licensing_GetBinaryContentType('foto');
 
 	$insertFormat = array(	'%s',
 				'%s', 
