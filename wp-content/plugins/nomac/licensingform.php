@@ -246,7 +246,7 @@ function licensing_ValidateItems($y) {
 
 	if (RequiredIsSet('voornaam') && RequiredIsSet('achternaam') && RequiredIsSet('klasse')) {
 		$tLicensing = $wpdb->prefix . TABLE_LICENSING;
-		$q = "SELECT Id FROM $tLicensing WHERE Voornaam = '".addslashes(strip_tags($_REQUEST['voornaam']))."' AND Achternaam = '".addslashes(strip_tags($_REQUEST['achternaam']))."' AND Klasse = '".addslashes(strip_tags($_REQUEST['klasse']))."'";
+		$q = "SELECT Id FROM $tLicensing WHERE Voornaam = '".addslashes(strip_tags($_REQUEST['voornaam']))."' AND Achternaam = '".addslashes(strip_tags($_REQUEST['achternaam']))."' AND Klasse = '".addslashes(strip_tags($_REQUEST['klasse']))."' AND year = ".$y."";
 		$row = $wpdb->get_row($q);
 		if ($row != NULL) {
 			$invalidItems[] = "Er is al iemand met die Voornaam en Achternaam aangemeld in de klasse. Je kan je niet twee keer aanmelden.";
