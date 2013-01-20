@@ -8,15 +8,14 @@ function admin_nomac_class() {
 
 	echo '<div class="wrap">';
 	screen_icon('users');
-	echo '<h2>NOMAC Club Beheer</h2>';
+	echo '<h2>NOMAC Klasse Beheer</h2>';
 	echo '<p>Op deze pagina worden de klasses beheerd. Je kan klasses toevoegen, verwijderen en aanpassen.</p>';
+	echo '<p>Klassen hebben een datum van uiterlijke inschrijving (Sluitings datum). Na deze datum kan men zich niet meer inschrijven voor de klasse.';
+	echo 'Als er een rijderslimiet is en er zijn al zoveel aanmeldingen, dan geld er een eerdere sluitingsdatum (Rijders Limiet Sluitings Datum). Voor die datum kunnen er dus meer rijders aanmelden dan de limiet!</p>';
 
 
 	if (isset($_POST['add'])) {
-		echo '<pre>';
-		print_r($_POST);
-		echo '</pre>';
-		echo 'Adding klasse...';
+		echo 'Klasse toevoegen...';
 		$data['Code'] = $_POST['code'];
 		$data['Name'] = $_POST['name'];
 		$data['CloseDate'] = $_POST['closedate'];
@@ -27,17 +26,13 @@ function admin_nomac_class() {
 	}
 
 	if (isset($_POST['delete'])) {
-		echo "Deleting klasse...";
+		echo "Klasse verwijderen...";
 		$q = $wpdb->prepare("DELETE FROM $tablename WHERE ID = %d", $_POST['id']);
 		$wpdb->query($q);
 	}
 
 	if (isset($_POST['update'])) {
-		echo '<pre>';
-		print_r($_POST);
-		echo '</pre>';
-
-		echo "Updating klasse name....";
+		echo "Klasse word bijgewerkt...";
 		$data['Name'] = $_POST['name'];
 		$data['CloseDate'] = $_POST['closedate'];
 		$data['MaxDrivers'] = $_POST['maxdrivers'];
@@ -50,7 +45,7 @@ function admin_nomac_class() {
 	$frequencies = $wpdb->get_results("SELECT Id, Code, Name, CloseDate, MaxDrivers, MaxDriversCloseDate, Price FROM ".$tablename);
 	if (count($frequencies) > 0) {
 		echo '<table class="wp-list-table widefat">';
-		echo '<thead><tr><th>Code</th><th>Name</th><th>Close Date</th><th>Max Drivers</th><th>Max Drivers Close Date</th><th>Price</th><th>Action</th><th></th></tr></thead>';
+		echo '<thead><tr><th>Code</th><th>Name</th><th>Sluitings datum</th><th>Rijders Limiet</th><th>Rijders Limiet Sluitings Datum</th><th>Price</th><th>Action</th><th></th></tr></thead>';
 		echo '<tbody>';
 		foreach ($frequencies as $freq)
 		{
