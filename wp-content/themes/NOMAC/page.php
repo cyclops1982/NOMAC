@@ -39,7 +39,10 @@ if ( have_posts() )
 		echo '</p>';
 	
 		the_content();
-		
+
+
+
+
 		wp_link_pages( 	
 			array( 
 			'before' => '<div class="page-link">Pages:', 
@@ -49,8 +52,28 @@ if ( have_posts() )
 		echo "</div>";
 
 		comments_template( '', true );
+
+		$args = array( 'post_type' => 'attachment', 'numberposts' => -1, 'post_status' => 'published', 'post_parent' => $post->ID ); 
+		$attachments = get_posts( $args );
+		if ($attachments) {
+			echo "<h1>Bijlagen</h1>";
+			echo "<br />";
+			echo "<table>";
+			echo "<tr><th>Title</th><th>Omschrijving</th><th>Link</th></tr>";
+			foreach ( $attachments as $a ) {
+				echo "<tr><td>";
+				echo apply_filters( 'the_title', $a->post_title );
+				echo "</td><td>" . $a->post_excerpt . "</td><td>";
+				echo wp_get_attachment_link( $a->ID, "full", false,false, "Openen");
+				echo "</td></tr>";
+			}
+			echo "</table>";
+			echo "<br />";
+		}
+
 	}
 }
+
 
 echo "</div>";
 
