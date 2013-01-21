@@ -73,6 +73,12 @@ function admin_nomac_licensinglist($year) {
 	$out  = '';
 
 	if (count($rows) > 0) {
+
+		$exportDir = NOMAC_PLUGIN_PATH . "/imagecache/" . $year . "/";
+		if (!is_dir($exportDir)) {
+			mkdir($exportDir);
+		}
+
 		$out .= '<form method="post" action="">';
 		$prevClass = "";
 		foreach ($rows as $row) {
@@ -87,9 +93,9 @@ function admin_nomac_licensinglist($year) {
 				case "image/png": $filename = $filename . ".png"; break;
 				default: $filename = $filename . ".UNKNOWN"; break;
 			}
-			$fullpath = NOMAC_PLUGIN_PATH . "/imagecache/" . $filename;
-			if ( ! file_exists($fullpath)) {
-				$fp = @fopen($fullpath, "wb");
+			$imagePath = $exportDir . $filename;
+			if ( ! file_exists($imagePath)) {
+				$fp = @fopen($imagePath, "wb");
 				if ($fp === FALSE) {
 					$out .= 'ERROR, COULD NOT CREATE IMAGECACHE FILE!';
 					echo $out;
@@ -120,7 +126,7 @@ function admin_nomac_licensinglist($year) {
 			} else {
 				$out .= '<td>' . $driverName . '</td>';
 			}
-			$path = plugins_url(NOMAC_BASEPATH . "/imagecache/" . $filename, NOMAC_BASEPATH);
+			$path = plugins_url(NOMAC_BASEPATH. "/imagecache/".$year."/".$filename);
 			$out .= '<td><img src="'.$path.'" height="50" /></td>';
 			$out .= '<td>' . stripslashes($row['ClassName']) . '</td>';
 			$out .= '<td>' . stripslashes($row['RegistrationDate']) . '</td>';
@@ -145,7 +151,6 @@ function admin_nomac_licensinglist($year) {
 		$out .= '</form>';
 		
 		
-		$exportDir = NOMAC_PLUGIN_PATH . "/imagecache/";
 		// Delete old files
 		$dir = dir($exportDir);
 		while (false !== ($entry = $dir->read())) {
@@ -196,7 +201,7 @@ function admin_nomac_licensinglist($year) {
 		$zip->close();
 		
 		if (file_exists($zipFileName)) {
-			$exportUrl = plugins_url(NOMAC_BASEPATH . "/imagecache/" . $exportFileName, NOMAC_BASEPATH);
+			$exportUrl = plugins_url(NOMAC_BASEPATH . "/imagecache/" . $year . "/" . $exportFileName);
 			$out .= '<a class="button-secondary" href="'.$exportUrl.'" title="Download export">Exporteren</a>';
 		}
 	}

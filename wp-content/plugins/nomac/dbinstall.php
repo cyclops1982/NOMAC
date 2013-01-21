@@ -68,6 +68,7 @@ function createLicensingTable() {
 			Freq2 varchar(20) null,
 			Freq3 varchar(20) null,
 			Transponder varchar(10) not null,
+			Transponder2 varchar(10) null,
 			VorigeLicentieNr varchar(10) not null,
 			Klasse varchar(10) not null,
 			Bedrag int not null,
@@ -78,7 +79,7 @@ function createLicensingTable() {
 			fotoContentType varchar(50) not null,
 			PRIMARY KEY  (Id)
 		);";
-	create_table($tablename, $sql, "licensing_version", "0.5.1");
+	create_table($tablename, $sql, "licensing_version", "0.6");
 
 
 	$tablename = $wpdb->prefix . TABLE_FREQUENCY;
@@ -193,72 +194,8 @@ function createLicensingTable() {
 	if ($wpdb->get_var("SELECT COUNT(Code) FROM $tablename") == 0) {
 		$data = array();
 
-		$data["Code"] = "AMCA";
-		$data["Name"] = "[AMCA] Auto Model Club Apeldoorn";
-		$wpdb->insert($tablename, $data);
-
-		$data["Code"] = "DeSluis";
-		$data["Name"] = "MBC De Sluis";
-		$wpdb->insert($tablename, $data);
-
-		$data["Code"] = "ERCE";
-		$data["Name"] = "[ERCE] Electro Racing Club Eindhoven";
-		$wpdb->insert($tablename, $data);
-
-		$data["Code"] = "Euregio";
-		$data["Name"] = "RC Club Euregio";
-		$wpdb->insert($tablename, $data);
-
-		$data["Code"] = "HFCC";
-		$data["Name"] = "[HFCC] Haagse Fiets Cross Club Hollandia";
-		$wpdb->insert($tablename, $data);
-
-		$data["Code"] = "HMRC";
-		$data["Name"] = "[HMRC] Helderse Model Race Club";
-		$wpdb->insert($tablename, $data);
-
-		$data["Code"] = "MRM";
-		$data["Name"] = "[MRM] Model Racing Midland";
-		$wpdb->insert($tablename, $data);
-
-		$data["Code"] = "MAC de Baanbrekers";
-		$data["Name"] = "Model Auto Club De BaanBrekers";
-		$wpdb->insert($tablename, $data);
-
-		$data["Code"] = "MACH";
-		$data["Name"] = "[MACH] Model Auto Club Heemstede";
-		$wpdb->insert($tablename, $data);
-
-		$data["Code"] = "MACH-ONE";
-		$data["Name"] = "[MACH-ONE] Model Auto Club Helmond";
-		$wpdb->insert($tablename, $data);
-
-		$data["Code"] = "MRCE";
-		$data["Name"] = "[MRCE] Model Racing Club Elshout";
-		$wpdb->insert($tablename, $data);
-
-		$data["Code"] = "MGR";
-		$data["Name"] = "[MRG] Model Race Genk vzw";
-		$wpdb->insert($tablename, $data);
-
-		$data["Code"] = "ORCD";
-		$data["Name"] = "[ORCD] Off Road Club Drente";
-		$wpdb->insert($tablename, $data);
-
-		$data["Code"] = "RACO";
-		$data["Name"] = "[RACO] Raco 2000";
-		$wpdb->insert($tablename, $data);
-
-		$data["Code"] = "RCCT";
-		$data["Name"] = "[RCCT] RC Club Twente";
-		$wpdb->insert($tablename, $data);
-
-		$data["Code"] = "RCHotWheels";
-		$data["Name"] = "[HotWheels] Deventer Modelauto Club RC Hot Wheels";
-		$wpdb->insert($tablename, $data);
-
-		$data["Code"] = "REAL80";
-		$data["Name"] = "[REAL80] Model Racing Club Real 80";
+		$data["Code"] = "CLUB";
+		$data["Name"] = "[CLUB] Example club";
 		$wpdb->insert($tablename, $data);
 	}
 
@@ -278,66 +215,13 @@ function createLicensingTable() {
 
 	if ($wpdb->get_var("SELECT COUNT(Code) FROM $tablename") == 0) {
 		$data = array( 
-				"Code" => "BC10-NOMAC",
-				"Name" => "Brandstof 1:10 200mm - NOMAC",
+				"Code" => "XX-EXAMPLE",
+				"Name" => "Example Class",
 				"CloseDate" => "2012-06-01",
 				"MaxDrivers" => NULL,
 				"MaxDriversCloseDate" => NULL,
-				"Price" => 90);
+				"Price" => 100);
 		$wpdb->insert($tablename, $data);
-	
-		$data["Code"] = "BC10-NK";
-		$data["Name"] = "Brandstof 1:10 200mm - NK";
-		$data["Price"] = 90;
-		$wpdb->insert($tablename, $data);
-	
-		$data["Code"] = "EC10-STOCK";
-		$data["Name"] = "Electro 1:10 - Stock";
-		$data["Price"] = 100;
-		$wpdb->insert($tablename, $data);
-	
-		$data["Code"] = "EC10-NK";
-		$data["Name"] = "Electro 1:10 - Modified";
-		$data["Price"] = 100;
-		$wpdb->insert($tablename, $data);
-	
-		$data["Code"] = "EC10-PROTEN";
-		$data["Name"] = "Electro 1:10 - Proten";
-		$data["Price"] = 100;
-		$wpdb->insert($tablename, $data);
-
-		$data["Code"] = "EC10-LIC";
-		$data["Name"] = "Electro 1:10 - Licentie";
-		$data["Price"] = 40;
-		$wpdb->insert($tablename, $data);
-
-		$data["Code"] = "BC05-LIC";
-		$data["Name"] = "Brandstof 1:5 - Licentie";
-		$data["Price"] = 40;
-		$wpdb->insert($tablename, $data);
-
-		$data["Code"] = "BC05-NK";
-		$data["Name"] = "Brandstof 1:5 - NK";
-		$data["Price"] = 80;
-		$wpdb->insert($tablename, $data);
-		
-		$data["Code"] = "OR06-NK";
-		$data["Name"] = "OffRoad 1:6 - NK";
-		$data["Price"] = 100;
-		$wpdb->insert($tablename, $data);
-
-		$data["Code"] = "OR06-LIC";
-		$data["Name"] = "OffRoad 1:6 - Licentie";
-		$data["Price"] = 40;
-		$wpdb->insert($tablename, $data);
-
-		$data["Code"] = "BC08";
-		$data["MaxDrivers"] = 54;
-		$data["MaxDriversCloseDate"] = "2012-03-18";
-		$data["Name"] = "Brandstof 1:8";
-		$data["Price"] = 100;
-		$wpdb->insert($tablename, $data);
-	
 	}
 
 	$wpdb->hide_errors();

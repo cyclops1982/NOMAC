@@ -60,6 +60,7 @@ function licensing_handlePost($yearOfLicense, $bedrag) {
 	$insertData['Freq1'] = strip_tags($_REQUEST['freq1']);
 	$insertData['Freq2'] = strip_tags($_REQUEST['freq2']);
 	$insertData['Transponder'] = strip_tags($_REQUEST['transponder']);
+	$insertData['Transponder2'] = strip_tags($_REQUEST['transponder2']);
 	$insertData['VorigeLicentieNr'] = strip_tags($_REQUEST['vorigelicentienr']);
 	$insertData['Klasse'] = strip_tags($_REQUEST['klasse']);
 	$insertData['Bedrag'] = $bedrag;
@@ -70,6 +71,7 @@ function licensing_handlePost($yearOfLicense, $bedrag) {
 	$insertData['fotoContentType'] = licensing_GetBinaryContentType('foto');
 
 	$insertFormat = array(	'%s',
+				'%s', 
 				'%s', 
 				'%s', 
 				'%s', 
@@ -291,7 +293,7 @@ function licensing_outputForm($y) {
 	$out .= '<tr>';
 	$out .= '<th>Voornaam *:</th>';
 	if (isset($_REQUEST['voornaam'])) {
-		$out .= '<td colspan="3"><input type="text" name="voornaam" size="35" value="'.$_REQUEST['voornaam'].'"/></td>';
+		$out .= '<td colspan="3"><input type="text" name="voornaam" size="35" value="'.stripslashes($_REQUEST['voornaam']).'"/></td>';
 	} else {
 		$out .= '<td colspan="3"><input type="text" name="voornaam" size="35" /></td>';
 	}
@@ -300,7 +302,7 @@ function licensing_outputForm($y) {
 	$out .= '<tr>';
 	$out .= '<th>Achternaam *:</th>';
 	if (isset($_REQUEST['achternaam'])) {
-		$out .= '<td colspan="3"><input type="text" name="achternaam" size="35" value="'.$_REQUEST['achternaam'].'"/></td>';
+		$out .= '<td colspan="3"><input type="text" name="achternaam" size="35" value="'.stripslashes($_REQUEST['achternaam']).'"/></td>';
 	} else {
 		$out .= '<td colspan="3"><input type="text" name="achternaam" size="35" /></td>';
 	}
@@ -309,13 +311,13 @@ function licensing_outputForm($y) {
 	$out .= '<tr>';
 	$out .= '<th>Straat *:</th>';
 	if (isset($_REQUEST['straat'])) {
-		$out .= '<td><input type="text" name="straat" size="35" value="'.$_REQUEST['straat'].'"/></td>';
+		$out .= '<td><input type="text" name="straat" size="35" value="'.stripslashes($_REQUEST['straat']).'"/></td>';
 	} else {
 		$out .= '<td><input type="text" name="straat" size="35" /></td>';
 	}
 	$out .= '<th>Huisnr *:</th>';
 	if (isset($_REQUEST['huisnr'])) {
-		$out .= '<td><input type="text" name="huisnr" size="10" value="'.$_REQUEST['huisnr'].'" /></td>';
+		$out .= '<td><input type="text" name="huisnr" size="10" value="'.stripslashes($_REQUEST['huisnr']).'" /></td>';
 	} else {
 		$out .= '<td><input type="text" name="huisnr" size="10" /></td>';
 	}
@@ -324,13 +326,13 @@ function licensing_outputForm($y) {
 	$out .= '<tr>';
 	$out .= '<th>Woonplaats *:</th>';
 	if (isset($_REQUEST['woonplaats'])) {
-		$out .= '<td><input type="text" name="woonplaats" size="35" value="'.$_REQUEST['woonplaats'].'"/></td>';
+		$out .= '<td><input type="text" name="woonplaats" size="35" value="'.stripslashes($_REQUEST['woonplaats']).'"/></td>';
 	} else {
 		$out .= '<td><input type="text" name="woonplaats" size="35" /></td>';
 	}
 	$out .= '<th>Postcode *:</th>';
 	if (isset($_REQUEST['postcode'])) {
-		$out .= '<td><input type="text" name="postcode" size="10" maxlength="7" value="'.$_REQUEST['postcode'].'" /></td>';
+		$out .= '<td><input type="text" name="postcode" size="10" maxlength="7" value="'.stripslashes($_REQUEST['postcode']).'" /></td>';
 	} else {
 		$out .= '<td><input type="text" name="postcode" size="10" maxlength="7" /></td>';
 	}
@@ -339,7 +341,7 @@ function licensing_outputForm($y) {
 	$out .= '<tr>';
 	$out .= '<th>Geboorte Datum *:</th>';
 	if (isset($_REQUEST['geboortedatum'])) {
-		$out .= '<td colspan="3"><input type="text" name="geboortedatum" size="8" value="'.$_REQUEST['geboortedatum'].'" /> (dag-maand-jaar)</td>';
+		$out .= '<td colspan="3"><input type="text" name="geboortedatum" size="8" value="'.stripslashes($_REQUEST['geboortedatum']).'" /> (dag-maand-jaar)</td>';
 	} else {
 		$out .= '<td colspan="3"><input type="text" name="geboortedatum" size="8" />(dag-maand-jaar)</td>';
 	}
@@ -348,7 +350,7 @@ function licensing_outputForm($y) {
 	$out .= '<tr>';
 	$out .= '<th>Telefoon:</th>';
 	if (isset($_REQUEST['telefoonnr'])) {
-		$out .= '<td colspan="3"><input type="text" name="telefoonnr" size="15" value="'.$_REQUEST['telefoonnr'].'"/></td>';
+		$out .= '<td colspan="3"><input type="text" name="telefoonnr" size="15" value="'.stripslashes($_REQUEST['telefoonnr']).'"/></td>';
 	} else {
 		$out .= '<td colspan="3"><input type="text" name="telefoonnr" size="15" /></td>';
 	}
@@ -357,7 +359,7 @@ function licensing_outputForm($y) {
 	$out .= '<tr>';
 	$out .= '<th>E-mail *:</th>';
 	if (isset($_REQUEST['email'])) {
-		$out .= '<td colspan="3"><input type="text" name="email" size="35" value="'.$_REQUEST['email'].'" /></td>';
+		$out .= '<td colspan="3"><input type="text" name="email" size="35" value="'.stripslashes($_REQUEST['email']).'" /></td>';
 	} else {
 		$out .= '<td colspan="3"><input type="text" name="email" size="35" /></td>';
 	}
@@ -371,18 +373,24 @@ function licensing_outputForm($y) {
 	$out .= '</tr>';
 
 	$out .= '<tr>';
-	$out .= '<th>Transponder *:</th>';
+	$out .= '<th>1<sup>e</sup> Transponder *:</th>';
 	if (isset($_REQUEST['transponder'])) {
-		$out .= '<td colspan="3"><input type="text" name="transponder" size="10" value="'.$_REQUEST['transponder'].'" /></td>';
+		$out .= '<td><input type="text" name="transponder" size="10" value="'.stripslashes($_REQUEST['transponder']).'" /></td>';
 	} else {
-		$out .= '<td colspan="3"><input type="text" name="transponder" size="10" /></td>';
+		$out .= '<td><input type="text" name="transponder" size="10" /></td>';
+	}
+	$out .= '<th>2<sup>e</sup> Transponder:';
+	if (isset($_REQUEST['transponder2'])) {
+		$out .= '<td><input type="text" name="transponder2" size="10" value="'.$_REQUEST['transponder2'].'" /></td>';
+	} else {
+		$out .= '<td><input type="text" name="transponder2" size="10" /></td>';
 	}
 	$out .= '</tr>';
 	
 	$out .= '<tr>';
 	$out .= '<th>Vorige licentie nr:</th>';
 	if (isset($_REQUEST['vorigelicentienr'])) {
-		$out .= '<td colspan="3"><input type="text" name="vorigelicentienr" size="10" value="'.$_REQUEST['vorigelicentienr'].'" /> (alleen als je een licentie had)</td>';
+		$out .= '<td colspan="3"><input type="text" name="vorigelicentienr" size="10" value="'.stripslashes($_REQUEST['vorigelicentienr']).'" /> (alleen als je een licentie had)</td>';
 	} else {
 		$out .= '<td colspan="3"><input type="text" name="vorigelicentienr" size="10" /> (alleen als je een licentie had)</td>';
 	}
