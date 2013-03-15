@@ -13,7 +13,11 @@ function outputNomacLicensingList($attrs) {
         }
         $year = (int)$attrs["year"];
 	
-	$rows = $wpdb->get_results("SELECT LIC.Voornaam, LIC.Achternaam, C.Name AS Klasse, LIC.LidBijClub, LIC.RegistrationDate, LIC.Status FROM $tLic AS LIC INNER JOIN $tClass AS C ON C.Code = LIC.Klasse WHERE Year = $year ORDER BY LIC.Klasse, LIC.RegistrationDate");
+	$rows = $wpdb->get_results("SELECT LIC.Voornaam, LIC.Achternaam, C.Name AS Klasse, LIC.LidBijClub, LIC.RegistrationDate, LIC.Status 
+								FROM $tLic AS LIC 
+								INNER JOIN $tClass AS C ON C.Code = LIC.Klasse 
+								WHERE Year = $year AND LIC.Status <> 'Verwijderd' AND LIC.Status <> 'Ingetrokken'
+								ORDER BY LIC.Klasse, LIC.RegistrationDate");
 	
 	if (count($rows) > 0) {
 		$prevClass = "";
@@ -53,7 +57,11 @@ function outputNomacLicensingTotals($attrs) {
         }
         $year = (int)$attrs["year"];
 
-	$counts = $wpdb->get_results("SELECT COUNT(LIC.Id) AS Count, C.Name AS Klasse FROM $tLic AS LIC INNER JOIN $tClass AS C ON LIC.Klasse = C.Code WHERE Year = $year GROUP BY LIC.Klasse");
+	$counts = $wpdb->get_results("SELECT COUNT(LIC.Id) AS Count, C.Name AS Klasse 
+									FROM $tLic AS LIC 
+									INNER JOIN $tClass AS C ON LIC.Klasse = C.Code 
+									WHERE Year = $year AND LIC.Status <> 'Verwijderd' AND LIC.Status <> 'Ingetrokken'
+									GROUP BY LIC.Klasse");
 	if (count($counts) > 0) {
 		$out .= '<table>';
 		$out .= '<tr><th>Klasse</th><th>Aantal</th></tr>';

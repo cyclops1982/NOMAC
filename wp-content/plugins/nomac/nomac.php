@@ -99,7 +99,7 @@ function nomac_remove_capabilities() {
 add_action('admin_menu', 'nomac_admin_menu');
 function nomac_admin_menu() {
 	add_menu_page("NOMAC Admin", "NOMAC", NOMAC_CAP_ADMIN, "NOMAC", "admin_nomac_main");
-	add_submenu_page("NOMAC", "Licentie beheer", "Licentie beheer", NOMAC_CAP_LICENSING, "Licensing", "admin_nomac_licensing");
+	add_submenu_page("NOMAC", "Licentie beheer", "Licentie beheer", NOMAC_CAP_LICENSING, "Licensing", "admin_nomac_license");
 	add_submenu_page("NOMAC", "Reglementswijzigingen beheer", "Reglementswijzigingen beheer", NOMAC_CAP_RULECHANGE, "Reglementswijzigingen", "admin_nomac_rulechange");
 	add_submenu_page("NOMAC", "Image Cycle", "Image Cycle", NOMAC_CAP_IMAGECYCLE, "ImageCycle", "admin_nomac_imagecycle");
 	add_submenu_page("NOMAC", "Frequenties", "Frequenties", NOMAC_CAP_FREQUENCY, "Frequency", "admin_nomac_frequency");

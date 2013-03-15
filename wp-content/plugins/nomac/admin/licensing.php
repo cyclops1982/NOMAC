@@ -1,11 +1,9 @@
 <?php
 
 
-function admin_nomac_licensing() {
+function admin_nomac_license() {
 	global $wpdb;
-
 	$tLic = $wpdb->prefix . TABLE_LICENSING;
-
 	echo '<div class="wrap">';
 	screen_icon('users');
 	echo '<h2>NOMAC Licentie Beheer</h2>';
@@ -15,11 +13,17 @@ function admin_nomac_licensing() {
 	if (!isset($_SESSION['LIC_YEAR'])) {
 		$_SESSION['LIC_YEAR'] = date('Y');
 	}
-	if (isset($_REQUEST['do'])) {
-		if ( $_REQUEST['do'] == "Selecteer Jaar") {
-			$_SESSION['LIC_YEAR'] = $_REQUEST['year'];
-		} else if ($_REQUEST['do'] == "Statussen aanpassen") {
+
+	if (! isset($_REQUEST['do'])) {
+		$_REQUEST['do'] = "";
+	}
+
+
+
+	switch($_REQUEST['do']) {
+		case "Statussen aanpassen":
 			echo "<ul>";
+			$wpdb->show_errors();
 			foreach ($_REQUEST['status'] as $statkey => $statval) {
 				if (is_numeric($statkey) && !empty($statval)) {
 					$id = (int)$statkey;
@@ -29,20 +33,45 @@ function admin_nomac_licensing() {
 						echo "<li>Status voor ".stripslashes($_REQUEST['DriverName'][$id])." aangepast.</li>";
 					} else {
 						echo "<li>Status voor ".stripslashes($_REQUEST['DriverName'][$id])." aangepassen is <b>MISLUKT!</b>.</li>";
+						echo $wpdb->error();
 					}
 				}
 			}
 			echo "</ul>";
-		}
+			admin_nomac_license_defaultpage();
+		break;
+		case "Selecteer Jaar":
+			$_SESSION['LIC_YEAR'] = $_REQUEST['year'];
+			admin_nomac_license_defaultpage();
+			break;
+		default:
+			admin_nomac_license_defaultpage();
+			break;
 	}
+
+	
+	echo "</div>";
+}
+
+function admin_nomac_license_defaultpage() {
+	admin_nomac_license_showyearselect($_SESSION['LIC_YEAR']);
+	admin_nomac_license_list($_SESSION['LIC_YEAR']);
+	admin_nomac_license_totals($_SESSION['LIC_YEAR']);
+}
+
+
+function admin_nomac_license_showyearselect($year) {
+	global $wpdb;
+	$tLic = $wpdb->prefix . TABLE_LICENSING;
 
 	$yearQuery = "SELECT year FROM $tLic GROUP BY year";
 	$years = $wpdb->get_results($yearQuery);
+
 	echo '<form method="post" action="">';
 	echo 'Selecteer een jaar/seizoen: ';
 	echo '<select name="year">';
 	foreach ($years as $y) {
-		if ($_SESSION['LIC_YEAR'] == $y->year) {
+		if ($year == $y->year) {
 			echo '<option value="'.$y->year.'" selected="selected">'.$y->year.'</option>';
 		} else {
 			echo '<option value="'.$y->year.'">'.$y->year.'</option>';
@@ -51,19 +80,10 @@ function admin_nomac_licensing() {
 	echo '</select>';
 	echo '<input class="button-secondary" type="submit" name="do" value="Selecteer Jaar" />';
 	echo '</form>';	
-
-	echo "Lijst voor het seizoen/jaar " . $_SESSION['LIC_YEAR'];
-	echo "<br />";
-
-	admin_nomac_licensinglist($_SESSION['LIC_YEAR']);
-	echo "<br /><br />";
-	admin_nomac_licensingtotals($_SESSION['LIC_YEAR']);
-	
-	echo "</div>";
 }
 
 
-function admin_nomac_licensinglist($year) {
+function admin_nomac_license_list($year) {
 	global $wpdb;
 	$tLic = $wpdb->prefix . TABLE_LICENSING;
 	$tClass = $wpdb->prefix . TABLE_CLASS;
@@ -71,6 +91,8 @@ function admin_nomac_licensinglist($year) {
 	$rows = $wpdb->get_results($query, ARRAY_A);
 
 	$out  = '';
+	$out .= 'Lijst voor het seizoen/jaar ' . $year . '<br />';
+
 
 	if (count($rows) > 0) {
 
@@ -121,18 +143,14 @@ function admin_nomac_licensinglist($year) {
 			$out .= '<tr>';
 			$driverName = stripslashes($row['Voornaam']) . ' ' . stripslashes($row['Achternaam']);
 			$out .= '<input type="hidden" name="DriverName[' . $row['Id'] . ']" value="' . $driverName .'" />';
-			if (!empty($row['Email'])) {
-				$out .= '<td><a href="mailto:' . $row['Email'] . '">' .  $driverName . '</td>';
-			} else {
-				$out .= '<td>' . $driverName . '</td>';
-			}
+			$out .= '<td><a href="?page=Licensing&do=EditLicense&licenseid='. $row['Id'].'">' . $driverName . '</a></td>';
 			$path = plugins_url(NOMAC_BASEPATH. "/imagecache/".$year."/".$filename);
 			$out .= '<td><img src="'.$path.'" height="50" /></td>';
 			$out .= '<td>' . stripslashes($row['ClassName']) . '</td>';
 			$out .= '<td>' . stripslashes($row['RegistrationDate']) . '</td>';
 			$out .= '<td>';
 
-			$statusses = Array('Aanvraag ontvangen', 'Betaling ontvangen', 'Betaling onvoldoende', 'Ter goedkeuring bij club', 'Toegekend', 'Afgewezen');
+			$statusses = Array('Aanvraag ontvangen', 'Betaling ontvangen', 'Betaling onvoldoende', 'Ter goedkeuring bij club', 'Toegekend', 'Afgewezen', 'Ingetrokken', 'Verwijderd');
 			$out .= '<select name="status['.$row['Id'].']">';
 			foreach ($statusses as $stat) {
 				if ($row['Status'] == $stat) {
@@ -213,7 +231,7 @@ function admin_nomac_licensinglist($year) {
 
 
 
-function admin_nomac_licensingtotals($year) {
+function admin_nomac_license_totals($year) {
 	global $wpdb;
 	$out = "";
 
