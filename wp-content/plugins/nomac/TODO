@@ -1,10 +1,13 @@
 What to build:
-- Move category widget into nomac plugin
+- Beheren van licentie lijst (status verwijderen, bewerken van gegevens (verplaatsen van klasse!))
+- Aligning van tinymce en op de site.
+- Kalender moet ook uit het verleden laten zien (meerdaags evenement)
 - Klasse beheer is not fully dutch
+- Facebook knop. Facebook pagina. Facebook link met nomac site.
 - Form/Admin for EFRA licensing
 - Form/Admin for ALV voorstellen
+- Move category widget into nomac plugin
 - Form/admin for Official registration
-
 
 Info:
 http://au.php.net/manual/en/function.filter-var.php
