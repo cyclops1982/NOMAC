@@ -12,6 +12,7 @@ DEFINE('TABLE_CLUBS', 'nomac_clubs');
 DEFINE('TABLE_CLASS', 'nomac_class');
 DEFINE('TABLE_FREQUENCY', 'nomac_frequency');
 DEFINE('TABLE_IMAGECYCLE', 'nomac_imagecycle');
+DEFINE('TABLE_AUDIT', 'nomac_audit');
 
 // Capabilities
 DEFINE('NOMAC_CAP_ADMIN', 'Nomac Admin');
@@ -73,7 +74,7 @@ function cleanOutput($out) {
 }
 
 
-function outputDropdown($tablenameWithoutPrefix, $controlName, $showDefault = true) {
+function outputDropdown($tablenameWithoutPrefix, $controlName, $showDefault = true, $defaultValue = "") {
 	global $wpdb;
 	$tablename = $wpdb->prefix . $tablenameWithoutPrefix;
 	
@@ -84,7 +85,7 @@ function outputDropdown($tablenameWithoutPrefix, $controlName, $showDefault = tr
 		$out .= '<option value="" selected="true">Maak een keuze</option>';
 	}
 	foreach ($rows as $row) {
-		if (isset($_REQUEST[$controlName]) && $_REQUEST[$controlName] == $row->Code) {
+		if ( (isset($_REQUEST[$controlName]) && $_REQUEST[$controlName] == $row->Code) || (! empty($defaultValue) && $defaultValue == $row->Code)) {
 			$out .= '<option selected="selected" value="' . $row->Code . '">' . $row->Name . '</option>';
 		} else {
 			$out .= '<option value="' . $row->Code . '">' . $row->Name . '</option>';
@@ -96,4 +97,64 @@ function outputDropdown($tablenameWithoutPrefix, $controlName, $showDefault = tr
 }
 
 
+function outputClassDropdown($controlName, $showDefault = true, $defaultValue = "") {
+	global $wpdb;
+	$tablename = $wpdb->prefix . TABLE_CLASS;
+	
+	$rows = $wpdb->get_results("SELECT Code, Name, Price FROM " . $tablename);
+	$out  = "";
+	$out .= '<select name="' . $controlName . '" >';	
+	if ($showDefault) {
+		$out .= '<option value="" selected="true">Maak een keuze</option>';
+	}
+	foreach ($rows as $row) {
+		if ((isset($_REQUEST[$controlName]) && $_REQUEST[$controlName] == $row->Code) || (! empty($defaultValue) && $defaultValue == $row->Code) ) {
+			$out .= '<option selected="selected" value="' . $row->Code . '">' . $row->Name . '</option>';
+		} else {
+			$out .= '<option value="' . $row->Code . '">' . $row->Name . ' - (&euro; '.$row->Price.',-)</option>';
+		}
+	}
+	$out .= '</select>';
+
+	return $out;
+}
+
+
+function licensing_GetBinaryContentType($name) {
+	if (!isset($_FILES[$name]) || $_FILES[$name]['size'] <= 0 || $_FILES[$name]['error'] != 0) {
+		return NULL;
+	}
+	return $_FILES[$name]['type'];
+	
+
+}
+
+function licensing_GetBinaryFile($name) {
+	if (!isset($_FILES[$name]) || $_FILES[$name]['size'] <= 0 || $_FILES[$name]['error'] != 0) {
+		return NULL;
+	}
+	$fp = fopen($_FILES[$name]['tmp_name'], 'r');
+	if ($fp) {
+		$content = addslashes(fread($fp, filesize($_FILES[$name]['tmp_name'])));
+		fclose($fp);
+		return $content;
+	}
+	return NULL;
+}
+
+function licensing_BuildDate($date) {
+	$firstDash = strpos($date, "-");
+	$d = substr($date, 0, $firstDash);
+	$m = substr($date, $firstDash + 1, strpos($date, "-", $firstDash));
+	$y = substr($date, -4);
+	
+	return $y.'-'.$m.'-'.$d;
+}
+
+
+function licensing_GetBedrag($class) {
+	global $wpdb;
+	$tablename = $wpdb->prefix . TABLE_CLASS;
+	return $wpdb->get_var("SELECT Price FROM $tablename WHERE Code = '".$class."';");
+}
 ?>

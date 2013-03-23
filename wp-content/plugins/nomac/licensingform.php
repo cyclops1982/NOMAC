@@ -33,12 +33,6 @@ function outputNomacLicensingForm($attrs) {
 }
 
 
-function licensing_GetBedrag() {
-	global $wpdb;
-	$tablename = $wpdb->prefix . TABLE_CLASS;
-	$class = addslashes($_REQUEST['klasse']);
-	return $wpdb->get_var("SELECT Price FROM $tablename WHERE Code = '".$class."';");
-}
 
 function licensing_handlePost($yearOfLicense, $bedrag) {
 	global $wpdb;
@@ -117,36 +111,7 @@ function licensing_handlePost($yearOfLicense, $bedrag) {
 	return $out;
 }
 
-function licensing_GetBinaryContentType($name) {
-	if (!isset($_FILES[$name]) || $_FILES[$name]['size'] <= 0 || $_FILES[$name]['error'] != 0) {
-		return NULL;
-	}
-	return $_FILES[$name]['type'];
-	
 
-}
-
-function licensing_GetBinaryFile($name) {
-	if (!isset($_FILES[$name]) || $_FILES[$name]['size'] <= 0 || $_FILES[$name]['error'] != 0) {
-		return NULL;
-	}
-	$fp = fopen($_FILES[$name]['tmp_name'], 'r');
-	if ($fp) {
-		$content = addslashes(fread($fp, filesize($_FILES[$name]['tmp_name'])));
-		fclose($fp);
-		return $content;
-	}
-	return NULL;
-}
-
-function licensing_BuildDate($date) {
-	$firstDash = strpos($date, "-");
-	$d = substr($date, 0, $firstDash);
-	$m = substr($date, $firstDash + 1, strpos($date, "-", $firstDash));
-	$y = substr($date, -4);
-	
-	return $y.'-'.$m.'-'.$d;
-}
 
 function licensing_ValidateItems($y) {
 	global $wpdb;
@@ -417,30 +382,5 @@ function licensing_outputForm($y) {
 
 	return $out;
 }
-
-
-
-function outputClassDropdown($controlName, $showDefault = true) {
-	global $wpdb;
-	$tablename = $wpdb->prefix . TABLE_CLASS;
-	
-	$rows = $wpdb->get_results("SELECT Code, Name, Price FROM " . $tablename);
-	$out  = "";
-	$out .= '<select name="' . $controlName . '" >';	
-	if ($showDefault) {
-		$out .= '<option value="" selected="true">Maak een keuze</option>';
-	}
-	foreach ($rows as $row) {
-		if (isset($_REQUEST[$controlName]) && $_REQUEST[$controlName] == $row->Code) {
-			$out .= '<option selected="selected" value="' . $row->Code . '">' . $row->Name . '</option>';
-		} else {
-			$out .= '<option value="' . $row->Code . '">' . $row->Name . ' - (&euro; '.$row->Price.',-)</option>';
-		}
-	}
-	$out .= '</select>';
-
-	return $out;
-}
-
 
 ?>

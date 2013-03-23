@@ -40,24 +40,15 @@ add_shortcode('nomac-rulechange-list', 'outputNomacRulechangeList');
 
 /* Installation / DB Creation */
 register_activation_hook(__FILE__, 'nomac_add_capabilities');
-register_activation_hook(__FILE__, 'nomac_licensing_install'); 
-register_activation_hook(__FILE__, 'nomac_rulechange_install'); 
-register_activation_hook(__FILE__, 'nomac_imagecycle_install'); 
+register_activation_hook(__FILE__, 'nomac_dbinstall'); 
 register_deactivation_hook(__FILE__, 'nomac_remove_capabilties');
 
-function nomac_licensing_install() {
+function nomac_dbinstall() {
 	require_once("dbinstall.php");
 	createLicensingTable();
-}
-
-function nomac_imagecycle_install() {
-	require_once("dbinstall.php");
 	createImageCycleTable();
-}
-
-function nomac_rulechange_install() {
-	require_once("dbinstall.php");
 	createRulechangeTable();
+	createAuditTable();
 }
 
 function nomac_add_capabilities() {

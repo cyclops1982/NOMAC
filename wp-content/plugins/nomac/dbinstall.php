@@ -45,6 +45,24 @@ function createRulechangeTable() {
 	$wpdb->hide_errors();
 }
 
+function createAuditTable() {
+	global $wpdb;
+	$wpdb->show_errors();	
+
+	$tablename = $wpdb->prefix . TABLE_AUDIT;
+	$sql = "CREATE TABLE " . $tablename . " (
+			Id bigint(20) unsigned not null auto_increment,
+			ChangeBy nvarchar(100) NOT NULL,
+			ChangeDate datetime NOT NULL,
+			PrevValue longtext NULL,
+			NewValue longtext NULL,
+			PRIMARY KEY(Id)
+		);";
+	create_table($tablename, $sql, "nomac_audit_version", "1.0");
+
+	$wpdb->hide_errors();
+}
+
 
 function createLicensingTable() {
 	global $wpdb;
