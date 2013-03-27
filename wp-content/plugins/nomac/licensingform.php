@@ -21,8 +21,7 @@ function outputNomacLicensingForm($attrs) {
 			$out .= '<br />';
 			$out .= licensing_outputForm($y);
 		} else {
-			$bedrag = licensing_GetBedrag();
-			$out .= licensing_handlePost($y, $bedrag);
+			$out .= licensing_handlePost($y);
 		}
 	} else {	
 		$out .= licensing_outputForm($y);
@@ -34,9 +33,11 @@ function outputNomacLicensingForm($attrs) {
 
 
 
-function licensing_handlePost($yearOfLicense, $bedrag) {
+function licensing_handlePost($yearOfLicense) {
 	global $wpdb;
 	$out  = "";
+	
+	$bedrag = licensing_GetBedrag(strip_tags($_REQUEST['klasse']));
 	
 	$tablename = $wpdb->prefix . TABLE_LICENSING;
 	
@@ -53,6 +54,7 @@ function licensing_handlePost($yearOfLicense, $bedrag) {
 	$insertData['LidBijClub'] = strip_tags($_REQUEST['lidbijclub']);
 	$insertData['Freq1'] = strip_tags($_REQUEST['freq1']);
 	$insertData['Freq2'] = strip_tags($_REQUEST['freq2']);
+	$insertData['Freq3'] = strip_tags($_REQUEST['freq3']);
 	$insertData['Transponder'] = strip_tags($_REQUEST['transponder']);
 	$insertData['Transponder2'] = strip_tags($_REQUEST['transponder2']);
 	$insertData['VorigeLicentieNr'] = strip_tags($_REQUEST['vorigelicentienr']);
@@ -64,28 +66,29 @@ function licensing_handlePost($yearOfLicense, $bedrag) {
 	$insertData['foto'] = licensing_GetBinaryFile('foto'); 
 	$insertData['fotoContentType'] = licensing_GetBinaryContentType('foto');
 
-	$insertFormat = array(	'%s',
-				'%s', 
-				'%s', 
-				'%s', 
-				'%s', 
-				'%s', 
-				'%s', 
-				'%s', 
-				'%s', 
-				'%s', 
-				'%s', 
-				'%s', 
-				'%s', 
-				'%s', 
-				'%s', 
-				'%s', 
-				'%d', 
-				'%s', 
-				'%d', 
-				'%s', 
-				'%s',
-				'%s'); 
+	$insertFormat = array(	'%s', //Voornaam
+				'%s', //Achternaam
+				'%s', //Straat
+				'%s', //HuisNr
+				'%s', //postcode
+				'%s', //Woonplaats
+				'%s', //Geboortedatum
+				'%s', //TelefoonNr
+				'%s', //Email
+				'%s', //LidBijClub
+				'%s', //Freq1
+				'%s', //Freq2
+				'%s', //Freq3
+				'%s', //Transponder1
+				'%s', //Transponder2
+				'%s', //VorigeLicentieNr
+				'%s', //Klasse
+				'%d', //Bedrag
+				'%s', //Status
+				'%d', //Year
+				'%s', //RegistrationDate
+				'%s', //Foto
+				'%s');  //FotoContentType
 
 	if ($wpdb->insert($tablename, $insertData, $insertFormat)) {
 		$out .= "Bedankt voor het aanmelden! <br />";
@@ -332,9 +335,15 @@ function licensing_outputForm($y) {
 	
 	$out .= '<tr>';
 	$out .= '<th>Frequentie 1 *:</th>';
-	$out .= '<td>'.outputDropdown(TABLE_FREQUENCY, 'freq1').'</td>';
+	$out .= '<td colspan="3">'.outputDropdown(TABLE_FREQUENCY, 'freq1').'</td>';
+	$out .= '</tr>';
+	$out .= '<tr>';
 	$out .= '<th>Frequentie 2:</th>';
-	$out .= '<td>'.outputDropdown(TABLE_FREQUENCY, 'freq2').'</td>';
+	$out .= '<td colspan="3">'.outputDropdown(TABLE_FREQUENCY, 'freq2').'</td>';
+	$out .= '</tr>';
+	$out .= '<tr>';
+	$out .= '<th>Frequentie 3:</th>';
+	$out .= '<td colspan="3">'.outputDropdown(TABLE_FREQUENCY, 'freq3').'</td>';
 	$out .= '</tr>';
 
 	$out .= '<tr>';

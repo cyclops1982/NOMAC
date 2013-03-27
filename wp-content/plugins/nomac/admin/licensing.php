@@ -358,10 +358,6 @@ function admin_nomac_license_list($year) {
 					fclose($fp);
 				}
 			}
-			else {
-				echo $imagePath . 'exists. <br />';
-
-			}
 
 
 			if ($prevClass != $row['ClassName']) {
