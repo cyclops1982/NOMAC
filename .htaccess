@@ -1,0 +1,16 @@
+AuthName "nomac.nettrends.nl"
+AuthType Basic
+AuthUserFile /data/home/cyclops/cyclops.nettrends.nl/.htpasswd
+require valid-user
+
+# BEGIN WordPress
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /nomac/
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /nomac/index.php [L]
+</IfModule>
+
+# END WordPress
