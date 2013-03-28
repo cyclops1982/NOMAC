@@ -42,8 +42,17 @@ function table_exists($table)
 function create_table($tablename, $sql, $option, $version) {
 	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 
-	dbDelta($sql);
-	add_option($option, $version);
+	$option_value = get_option($option);
+	if ($option_value === FALSE || $option_value < $version) {
+		dbDelta($sql);
+		
+		if ($option_value === FALSE)
+			add_option($option, $version);
+		else
+			update_option($option, $version);
+	}
+
+	
 	
 	return table_exists($tablename);
 }
@@ -156,5 +165,23 @@ function licensing_GetBedrag($class) {
 	global $wpdb;
 	$tablename = $wpdb->prefix . TABLE_CLASS;
 	return $wpdb->get_var("SELECT Price FROM $tablename WHERE Code = '".$class."';");
+}
+
+
+function audit_CreateEntry($what, $value) {
+	global $wpdb, $current_user;
+	
+	get_currentuserinfo();
+
+	$tablename = $wpdb->prefix . TABLE_AUDIT;
+	$insertData = array();
+	$insertData['ChangedByUser'] = strip_tags($current_user->user_login);
+	$insertData['ChangedByIP'] = $_SERVER['REMOTE_ADDR'];
+	$insertData['ChangedOn'] = date("Y-m-d H:i:s");
+	$insertData['What'] = $what;
+	$insertData['Value'] = serialize($value);
+
+	$insertFormat = array(	'%s', '%s', '%s', '%s');
+	$wpdb->insert($tablename, $insertData, $insertFormat);
 }
 ?>

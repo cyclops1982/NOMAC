@@ -5,7 +5,7 @@ Plugin URI: http://www.nomac.nl
 Description: A plugin that does all the modifications for the NOMAC website.
 Author: Ruben d'Arco
 Author URI: http://cyclops.nettrends.nl/blog/
-Version: 0.3
+Version: 1.2
 */
 
 

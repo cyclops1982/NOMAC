@@ -13,7 +13,7 @@ function createImageCycleTable() {
                 link_url text NULL,
                 PRIMARY KEY  (id))
 		;";
-	create_table($tablename, $sql, "nomac_imagecycle_version", "1.1");
+	create_table($tablename, $sql, "nomac_imagecycle_version", "1.2");
 
 	$wpdb->hide_errors();
 }
@@ -40,7 +40,7 @@ function createRulechangeTable() {
 			Deleted bit(1) NOT NULL DEFAULT 0,
 			PRIMARY KEY  (Id)
 		);";
-	create_table($tablename, $sql, "nomac_rulechange_version", "1.0");
+	create_table($tablename, $sql, "nomac_rulechange_version", "1.2");
 
 	$wpdb->hide_errors();
 }
@@ -52,13 +52,14 @@ function createAuditTable() {
 	$tablename = $wpdb->prefix . TABLE_AUDIT;
 	$sql = "CREATE TABLE " . $tablename . " (
 			Id bigint(20) unsigned not null auto_increment,
-			ChangeBy nvarchar(100) NOT NULL,
-			ChangeDate datetime NOT NULL,
-			PrevValue longtext NULL,
-			NewValue longtext NULL,
+			ChangedByUser nvarchar(100) not null,
+			ChangedByIP nvarchar(40),
+			ChangedOn datetime NOT NULL,
+			What longtext NULL,
+			Value longtext NULL,
 			PRIMARY KEY(Id)
 		);";
-	create_table($tablename, $sql, "nomac_audit_version", "1.0");
+	create_table($tablename, $sql, "nomac_audit_version", "1.2");
 
 	$wpdb->hide_errors();
 }
@@ -97,7 +98,7 @@ function createLicensingTable() {
 			fotoContentType varchar(50) not null,
 			PRIMARY KEY  (Id)
 		);";
-	create_table($tablename, $sql, "licensing_version", "0.6");
+	create_table($tablename, $sql, "licensing_version", "1.2");
 
 
 	$tablename = $wpdb->prefix . TABLE_FREQUENCY;
@@ -108,7 +109,7 @@ function createLicensingTable() {
 			PRIMARY KEY  (Id),
 			UNIQUE KEY Code_Unique (Code)
 		);";
-	create_table($tablename, $sql, "licensing_version", "0.5.2");
+	create_table($tablename, $sql, "licensing_version", "1.2");
 	if ($wpdb->get_var("SELECT COUNT(Code) FROM $tablename") == 0) {
                 $data = array();
 
@@ -207,7 +208,7 @@ function createLicensingTable() {
 			UNIQUE KEY UN_Code (Code),
 			PRIMARY KEY  (Id)
 		);";
-	create_table($tablename, $sql, "licensing_version", "0.5.3");
+	create_table($tablename, $sql, "licensing_version", "1.2");
 
 	if ($wpdb->get_var("SELECT COUNT(Code) FROM $tablename") == 0) {
 		$data = array();
@@ -229,7 +230,7 @@ function createLicensingTable() {
 			UNIQUE KEY UX_Code (Code),
 			PRIMARY KEY  (Id)
 		);";
-	create_table($tablename, $sql, "licensing_version", "0.5.5");
+	create_table($tablename, $sql, "licensing_version", "1.2");
 
 	if ($wpdb->get_var("SELECT COUNT(Code) FROM $tablename") == 0) {
 		$data = array( 

@@ -31,6 +31,7 @@ function admin_nomac_license() {
 					$data = array("Status" => $statval);
 					if ($wpdb->update($tLic, $data, $where, array('%s'), array('%d')) == 1) {
 						echo "<li>Status voor ".stripslashes($_REQUEST['DriverName'][$id])." aangepast.</li>";
+						audit_CreateEntry("Driver status update", $_REQUEST['DriverName'][$id]." changed status to ".$statval);
 					} else {
 						echo "<li>Status voor ".stripslashes($_REQUEST['DriverName'][$id])." aangepassen is <b>MISLUKT!</b>.</li>";
 						echo $wpdb->error();
@@ -155,6 +156,7 @@ function admin_nomac_license_save($year) {
 	$where = array();
 	$where['Id'] = $licId;
 	$wpdb->show_errors();
+	audit_CreateEntry("License update", $updateData);
 	$updateRes = $wpdb->update($tLic, $updateData, $where, $updateFormat, "%d");
 	if ($updateRes == 0 || $updateRes == false) {
 		echo 'Sorry, no update performed!<br />';
