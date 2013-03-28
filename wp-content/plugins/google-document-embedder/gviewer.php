@@ -2,15 +2,15 @@
 
 /*
 Plugin Name: Google Doc Embedder
-Plugin URI: http://www.davismetro.com/gde/
+Plugin URI: http://www.davistribe.org/gde/
 Description: Lets you embed MS Office, PDF, TIFF, and many other file types in a web page using the Google Docs Viewer (no Flash or PDF browser plug-ins required).
 Author: Kevin Davis
-Author URI: http://www.davismetro.com/
-Version: 2.2.3
+Author URI: http://www.davistribe.org/
+Text Domain: gde
+Domain Path: /languages/
+Version: 2.5.6
 License: GPLv2
 */
-
-$gde_ver = "2.2.3.98";
 
 /**
  * LICENSE
@@ -31,274 +31,401 @@ $gde_ver = "2.2.3.98";
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
  * @package    google-document-embedder
- * @author     Kevin Davis <kev@tnw.org>
+ * @author     Kevin Davis <wpp@tnw.org>
  * @copyright  Copyright 2012 Kevin Davis
  * @license    http://www.gnu.org/licenses/gpl.txt GPL 2.0
- * @link       http://davismetro.com/gde/
+ * @link       http://www.davistribe.org/gde/
  */
 
-include_once('gde-functions.php');
-$gdeoptions = get_option('gde_options');
-$pUrl = plugins_url(plugin_basename(dirname(__FILE__)));
+// boring init junk
+$gde_ver 				= "2.5.6.98";
+$gde_db_ver 			= "1.2";		// update also in gde_activate()
 
-// basic usage: [gview file="http://path.to/file.pdf"]
-function gde_gviewer_func($atts) {
+require_once( plugin_dir_path( __FILE__ ) . 'functions.php' );
+global $wp_version;
 
-	// current settings
-	global $gdeoptions, $exts, $pUrl, $user_ID;
+$pdata 					= gde_get_plugin_data();
+$gdeoptions				= get_option( 'gde_options' );
+$gdetypes				= gde_supported_types();		
+
+// check for db health
+$healthy = gde_debug_tables();
+
+// add admin functions only if needed
+if ( is_admin() ) { require_once( GDE_PLUGIN_DIR . 'functions-admin.php' ); }
+
+// get global settings - not implemented in this release
+/*
+if ( is_multisite() ) {
+	$gdeglobals			= get_site_option( 'gde_globals' );
+}
+*/
+
+// activate plugin, allow clear dx log on deactivate
+register_activation_hook( __FILE__, 'gde_activate' );
+register_deactivation_hook( __FILE__, 'gde_deactivate' );
+
+// bring the magic
+add_action( 'plugins_loaded', 'gde_load' );
+add_shortcode( 'gview', 'gde_do_shortcode' );
+
+function gde_do_shortcode( $atts ) {
+	global $healthy, $gdeoptions; //$gdeglobals
 	
-	extract(shortcode_atts(array(
+	// check profile table health
+	if ( ! $healthy ) {
+		delete_option('gde_db_version');
+		return gde_show_error( __('Unable to load profile settings', 'gde') );
+	}
+	
+	// handle global setting overrides - not active in this release
+	/*
+	if ($gdeglobals['enforce_viewer'] == "std") {
+		$gdeoptions['disable_proxy'] = "yes";
+	}
+	if ($gdeglobals['enforce_lang']) {
+		$gdeoptions['default_lang'] = $gdeglobals['enforce_lang'];
+	}
+	*/
+	
+	extract( shortcode_atts( array (
 		'file' => '',
-		'save' => $gdeoptions['show_dl'],
+		'profile' => 1, // default profile is always ID 1
+		'save' => '',
 		'width' => '',
 		'height' => '',
-		'lang' => $gdeoptions['default_lang'],
-		'force' => $gdeoptions['bypass_check'],
-		'cache' => $gdeoptions['disable_cache'],
-		'authonly' => $gdeoptions['restrict_dl'],
-		'page' => ''
-	), $atts));
+		'cache' => '',
+		'title' => '', // not yet implemented
+		'page' => '',
+		
+		// backwards compatibility < gde 2.5 (still work but now "deprecated" and discouraged in the documentation)
+		'authonly' => '',
+		'lang' => ''
+	), $atts ) );
 	
-	// translate nasty filenames with spaces
-	if (strpos($file, " ")) {
-		$file = str_replace(" ", "%20", $file);
-	}
-	
-	// set or clean up dimension values
-	$width = str_replace("px", "", trim($width));
-	if (!$width || !preg_match("/^\d+%?$/", $width)) {
-		$width = $gdeoptions['default_width'];
-		if ($gdeoptions['width_type'] == "pc") {
-			$width .= "%";
+	// get requested profile data (or default if doesn't exist)
+	$term = $profile;
+	if ( is_numeric( $term ) ) {
+		// id-based lookup
+		if ( ! $profile = gde_get_profiles( $term ) ) {
+			gde_dx_log("Loading default profile instead");
+			if ( ! $profile = gde_get_profiles( 1 ) ) {
+				$code = gde_show_error( __('Unable to load requested profile.', 'gde') );
+			} else {
+				$pid = 1;
+			}
+		} else {
+			$pid = $term;
 		}
-	}
-	if (!strpos($width, "%")) {
-		$width .= "px";
-	}
-	
-	$height = str_replace("px", "", trim($height));
-	if (!$height || !preg_match("/^\d+%?$/", $height)) {
-		$height = $gdeoptions['default_height'];
-		if ($gdeoptions['height_type'] == "pc") {
-			$height .= "%";
-		}
-	}
-	if (!strpos($height, "%")) {
-		$height .= "px";
-	}
-	
-	// supported file types - list acceptable extensions separated by |
-	$exts = "doc|docx|pdf|ppt|pptx|tif|tiff|xls|xlsx|pages|ai|psd|dxf|svg|eps|ps|ttf|xps|zip|rar";
-	
-	// check link for validity
-	$status = gde_validTests($file, $force);
-	if ($status && !is_array($status)) {
-		$code = "\n<!-- GDE EMBED ERROR: $status -->\n";
 	} else {
-		$code = "";
+		// name-based lookup
+		if ( ! $profile = gde_get_profiles( strtolower( $term ) ) ) {
+			gde_dx_log("Loading default profile instead");
+			if ( ! $profile = gde_get_profiles( 1 ) ) {
+				$code = gde_show_error( __('Unable to load requested profile.', 'gde') );
+			} else {
+				$pid = 1;
+			}
+		} else {
+			$pid = $profile['profile_id'];
+		}
+	}
 	
-		$fn = basename($file);
-		$fnp = gde_splitFilename($fn);
-		$fsize = $status['fsize'];
-		$fsize = gde_formatBytes($fsize);
+	// use profile defaults if shortcode override not defined
+	if ( empty( $save ) ) {
+		$save = $profile['link_show'];
+	}
+	if ( empty( $width ) ) {
+		$width = $profile['default_width'];
+	}
+	if ( empty( $height ) ) {
+		$height = $profile['default_height'];
+	}
+	if ( $cache !== "0" ) {
+		if ( empty( $cache ) ) {
+			$cache = $profile['cache'];
+		}
+	}
+	if ( empty( $lang ) ) {
+		if ( $profile['language'] !== "en_US" ) {
+			$lang =  $profile['language'];
+		}
+	}
+	
+	// tweak the dimensions if necessary
+	$width = gde_sanitize_dims( $width );
+	$height = gde_sanitize_dims( $height );
+	
+	// add base url if needed
+	if ( ! preg_match( "/^http/i", $file ) ) {
+		if ( substr( $file, 0, 2 ) == "//" ) {
+			// append dynamic protocol
+			if ( ! empty( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443 ) {
+				$file = "https:" . $file;
+			} else {
+				$file = "http:" . $file;
+			}
+		} elseif ( isset( $profile['base_url'] ) ) {
+			// not a full link, add base URL if available
+			if ( substr( $file, 0, 1 ) == "/" ) {
+				// remove any preceding slash from doc (base URL adds it)
+				$file = ltrim( $file, '/' );
+			}
+			$file = $profile['base_url'] . $file;
+		}
+	}
+	
+	// capture file details
+	$fn = basename( $file );
+	$fnp = gde_split_filename( $fn );
+	
+	// file validation
+	if ( $gdeoptions['error_check'] == "no" ) {
+		$force = true;
+	} else {
+		$force = false;
+	}
+	$status = gde_validate_file( str_replace( " ", "%20", $file ), $force );
+	
+	if ( ! isset( $code ) && ! is_array( $status ) && $status !== -1 ) {
+		// validation failed
+		$code = gde_show_error( $status );
+	} elseif ( ! isset( $code ) ) {
+		// validation passed or was skipped
 		
-		$code .=<<<HERE
-%A%
-<iframe src="%U%" class="gde-frame" style="width:%W%; height:%H%; border: none;" scrolling="no"></iframe>\n
-%B%
-HERE;
-
-		// obfuscate filename if cache disabled
-		if ($gdeoptions['disable_caching'] == "yes" || $cache == "no" || $cache == "0") {
-			$uefile = urlencode($file)."%3F".time();
-		} else {
-			$uefile = urlencode($file);
-		}
-		if ($gdeoptions['disable_proxy'] == "no") {
-			$gdet = $gdeoptions['restrict_tb'];
-			$lnk = $pUrl."/proxy.php?url=".$uefile."&hl=".$lang."&gdet=".$gdet."&embedded=true";
-		} else {
-			$lnk = "http://docs.google.com/viewer?url=".$uefile."&hl=".$lang."&embedded=true";
-		}
-		if (is_numeric($page)) {
-			// jump to selected page
-			$page = (int) $page-1;
-			$lnk = $lnk."#:0.page.".$page;
-		}
-		$linkcode = "";
-		
-		// hide download link for anonymous users
-		get_currentuserinfo();
-		$dlRestrict = $gdeoptions['restrict_dl'];
-		if ($user_ID == '') {
-			if ($dlRestrict == "yes" || $authonly == "yes" || $authonly == "1") {
-				// no user logged in and restrict set; override link setting
-				$save = "no";
+		// check for max filesize
+		$viewer = true;
+		if ( $gdeoptions['file_maxsize'] > 0 && isset( $status['fsize'] ) ) {
+			$maxbytes = (int) $gdeoptions['file_maxsize'] * 1024 * 1024;
+			if ( $status['fsize'] > $maxbytes ) {
+				$viewer = false;
 			}
 		}
-
-		if ($save == "yes" || $save == "1") {
+		
+		// generate links (embed, download)
+		$links = array( $file, $file );
+		if ( $profile['link_block'] == "yes" && gde_is_blockable( $profile ) ) {
+			if ( $secure = gde_get_secure_url( $file ) ) {
+				$links[0] = $secure;
+			} else {
+				$links[0] = '';
+			}
+			$links[1] = '';
+		} elseif ( $profile['link_show'] !== "none" ) {
+			if ( $profile['link_force'] == "yes" && $profile['link_mask'] == "no" ) {
+				$links[1] = GDE_PLUGIN_URL . "load.php?d=" . urlencode( $links[1] );
+			} elseif ( $profile['link_force'] == "no" && $profile['link_mask'] == "yes" ) {
+				$short = gde_get_short_url( $links[0] );
+				$links[0] = $short;
+				$links[1] = $short;
+			} elseif ( $profile['link_force'] == "yes" && $profile['link_mask'] == "yes" ) {
+				$short = gde_get_short_url( GDE_PLUGIN_URL . "load.php?d=" . urlencode( $links[0] ) );
+				$links[0] = $short;
+				$links[1] = $short;
+			}
+		}
+		
+		// obfuscate filename if cache disabled (globally or via shortcode)
+		if ( ! empty( $links[0] ) && ( $cache == "off" || $cache == "0" ) ) {
+			$links[0] .= "?" . time();
+		}
+		
+		// check for failed secure doc
+		if ( empty( $links[0] ) && empty( $links[1] ) ) {
+			$code = gde_show_error( __('Unable to secure document', 'gde') );
+		} else {
+		
+			// which viewer?
+			if ( $profile['viewer'] == "enhanced" ) {
+				$lnk = GDE_PLUGIN_URL . "view.php?url=" . urlencode( $links[0] ) . "&hl=" . $lang . "&gpid=" . $pid;
+			} else {
+				$lnk = "http://docs.google.com/viewer?url=" . urlencode( $links[0]  ) . "&hl=" . $lang;
+			}
 			
-			$dlMethod = $gdeoptions['link_func'];
-			if ($fnp[1] == "PDF") {
-				if ($dlMethod == "force" or $dlMethod == "force-mask") {
-					$dlFile = $pUrl;
-					$fileParts = parse_url($file);
-					$fileStr = str_replace($fileParts['scheme']."://","",$file);
-					$dlFile .= "/pdf.php?file=".$fileStr."&fn=".$fn;
-					$target = "_self";
-					$gaTag = 'onclick="var that=this;_gaq.push([\'_trackEvent,\'Download\',\'PDF\',this.href]);setTimeout(function(){location.href=that.href;},200);return false;"';
-				} elseif ($dlMethod == "default") {
-					$dlFile = $file;
-					$target = "_blank";
-					$gaTag = 'onclick="_gaq.push([\'_trackEvent\',\'Download\',\'PDF\',this.href]);"';
+			// what mode?
+			if ( $profile['tb_mobile'] == "always" ) {
+				$lnk .= "&mobile=true";
+			} else {
+				$lnk .= "&embedded=true";
+			}
+			
+			// build viewer
+			if ( $viewer == false ) {
+				// exceeds max filesize
+				$vwr = '';
+			} else {
+				$vwr = '<iframe src="%U%" class="gde-frame" style="width:%W%; height:%H%; border: none;"%ATTRS%></iframe>';
+				$vwr = str_replace("%U%", $lnk, $vwr);
+				$vwr = str_replace("%W%", $width, $vwr);
+				$vwr = str_replace("%H%", $height, $vwr);
+				
+				// frame attributes
+				$vattr[] = ' scrolling="no"';						// iphone scrolling bug
+				if ( ! empty( $page ) && is_numeric( $page ) ) {	// selected starting page
+					$page = (int) $page - 1;
+					$vattr[] = ' onload="javascript:this.contentWindow.location.hash=\':0.page.' . $page . '\';"';
 				}
-				if ($dlMethod == "force-mask") {
-					$dlFile = gde_shortUrl($dlFile);
-					$gaTag = 'onclick="var that=this;_gaq.push([\'_trackEvent,\'Download\',\'PDF\',this.href]);setTimeout(function(){location.href=that.href;},200);return false;"';
+				$vwr = str_replace( "%ATTRS%", implode( '', $vattr ), $vwr );
+			}
+			
+			// show download link?
+			$allow_save = false;
+			if ( ! empty( $links[1] ) ) {	// link empty = secure document; ignore any other save attribute
+				if ( $save == "all" || $save == "1" ) {
+					$allow_save = true;
+				} elseif ( ( $save == "users" || $authonly == "1" ) && is_user_logged_in() ) {
+					$allow_save = true;
+				}
+			}
+			
+			if ( $allow_save ) {
+				// build download link
+				$linkcode = '<p class="gde-text"><a href="%LINK%" class="gde-link"%ATTRS%>%TXT%</a></p>';
+				$linkcode = str_replace( "%LINK%", $links[1], $linkcode );
+				
+				// fix type
+				$ftype = strtoupper( $fnp[1] );
+				if ( $ftype == "TIF" ) { 
+					$ftype = "TIFF";
 				}
 				
-			} elseif ($dlMethod == "force-mask") {
-				$dlFile = gde_shortUrl($file);
-				$target = "_self";
-				$gaTag = 'onclick="var that=this;_gaq.push([\'_trackEvent,\'Download\',\''.$fnp[1].'\',this.href]);setTimeout(function(){location.href=that.href;},200);return false;"';
+				// link attributes
+				if ( $profile['link_mask'] == "yes" ) {
+					$attr[] = ' rel="nofollow"';
+				}
+				$attr[] = gde_ga_event( $file ); // GA integration
+				$linkcode = str_replace("%ATTRS%", implode( '', $attr ), $linkcode);
+				
+				// link text
+				if ( empty( $profile['link_text'] ) ) {
+					$profile['link_text'] = __('Download', 'gde');
+				}
+				$dltext = str_replace( "%TITLE", $title, $profile['link_text'] );
+				$dltext = str_replace( "%FILE", $fn, $dltext );
+				$dltext = str_replace( "%TYPE", $ftype, $dltext );
+				$dltext = str_replace( "%SIZE", gde_format_bytes( $status['fsize'] ), $dltext );
+				
+				$linkcode = str_replace( "%TXT%", $dltext, $linkcode );
 			} else {
-				$dlFile = $file;
-				$target = "_self";
-				$gaTag = 'onclick="var that=this;_gaq.push([\'_trackEvent,\'Download\',\''.$fnp[1].'\',this.href]);setTimeout(function(){location.href=that.href;},200);return false;"';
+				$linkcode = '';
 			}
-			$txt = $gdeoptions['link_text'];
-			if ($gdeoptions['enable_ga'] == "yes") {
-				$gaLink = " $gaTag";
+			
+			// link position
+			if ( $profile['link_pos'] == "above" ) {
+				$code = $linkcode . "\n" . $vwr;
+			} else {
+				$code = $vwr . "\n" . $linkcode;
 			}
-			$linkcode .= "<p class=\"gde-text\"><a href=\"$dlFile\" target=\"$target\" class=\"gde-link\"$gaLink>$txt</a></p>";
 		}
-		
-		if ($gdeoptions['link_pos'] == "above") {
-			$code = str_replace("%A%", $linkcode, $code);
-			$code = str_replace("%B%", '', $code);
-		} else {
-			$code = str_replace("%A%", '', $code);
-			$code = str_replace("%B%", $linkcode, $code);
-		}
-		$code = str_replace("%U%", $lnk, $code);
-		$code = str_replace("%W%", $width, $code);
-		$code = str_replace("%H%", $height, $code);
-		$code = str_replace("%FN", $fn, $code);
-		$code = str_replace("%FT", $fnp[1], $code);
-		$code = str_replace("%FS", $fsize, $code);
 	}
 	
 	return $code;
 }
 
-// activate plugin
-register_activation_hook( __FILE__, 'gde_activate');
+if ( is_admin() ) {
+	// add quick settings link to plugin list
+	add_filter( "plugin_action_links_" . plugin_basename( __FILE__ ), 'gde_actlinks' );
+	
+	// beta notification (if enabled)
+	if ( gde_check_for_beta( __FILE__ ) ) {
+		// override plugin update text
+		add_action( 'admin_enqueue_scripts', 'gde_admin_beta_js_update' );
+	} else {
+		// no update available, but notify if currently using a beta
+		add_action( 'after_plugin_row', 'gde_warn_on_plugin_page' );
+	}
+	
+	// editor integration
+	if ( ! isset( $gdeoptions['ed_disable'] ) || $gdeoptions['ed_disable'] == "no" ) {
+		// add quicktag
+		add_action( 'admin_print_scripts', 'gde_admin_print_scripts' );
+		
+		// add tinymce button
+		add_action( 'admin_init','gde_mce_addbuttons' );
+		
+		// extend media upload support to natively unsupported mime types
+		if ( $gdeoptions['ed_extend_upload'] == "yes" ) {
+			add_filter( 'upload_mimes', 'gde_upload_mimes' );
+		}
+		
+		if ( version_compare( $wp_version, "3.5", "<" ) ) {
+			// embed shortcode instead of link from media library for supported types
+			add_filter( 'attachment_fields_to_edit', 'gde_attachment_fields_to_edit', null, 2 );
+			add_filter( 'media_send_to_editor', 'gde_media_insert', 20, 3 );
+		} else {
+			//add_filter( 'attachment_fields_to_edit', 'gde_attachment_fields_to_edit_35', null, 2 );
+			add_filter( 'media_send_to_editor', 'gde_media_insert_35', 20, 3 );
+		}
+	}
+	
+	// add local settings page
+	add_action( 'admin_menu', 'gde_option_page' );
+	
+	//if ( is_multisite() ) {
+		// add global settings page
+		//add_action( 'network_admin_menu', 'gde_site_option_page' );	// not present in this release
+	//}
+}
 
-function gde_activate() {
+/**
+ * Activate the plugin
+ *
+ * @since   0.2
+ * @return  void
+ * @note	This function must remain in this file
+ */
+function gde_activate( $network_wide ) {
+	// check for sufficient php version (minimum supports json_encode)
+	if ( ! ( phpversion() >= '5.2.0' ) ) {
+		wp_die( 'Your server is running PHP version ' . phpversion() . ' but this plugin requires at least 5.2.0' );
+	}
+	
+	// set db schema version for this release - global not available here
+	$gde_db_ver = "1.2";
+	
+	// check for network-wide activation (currently not supported)
+	if ( $network_wide ) {
+		wp_die("Network activation is not supported at this time. Please activate individually until an update is available.");
+	}
+	
+	require_once( plugin_dir_path( __FILE__ ) . 'libs/lib-setup.php' );
+	
+	// create/update profile db, if necessary
+	if ( gde_db_tables( $gde_db_ver ) ) {
+		gde_setup();
+	} else {
+		gde_dx_log("Table creation failed; setup halted");
+		wp_die( __("Setup wasn't able to create the required database tables.", 'gde') );
+	}
+}
+
+/**
+ * Remove dx log on deactivation
+ *
+ * @since   2.5.2.1
+ * @return  void
+ */
+function gde_deactivate() {
 	global $wpdb;
 	
-	// initial options
-	$init = gde_init();
-}
-
-// add an option page
-add_action('admin_menu', 'gde_option_page');
-function gde_option_page() {
-	add_options_page(gde_t('GDE Settings'), gde_t('GDE Settings'), 'administrator', basename(__FILE__), 'gde_options');
-}
-function gde_options() {
-	if ( function_exists('current_user_can') && !current_user_can('manage_options') ) die(t('An error occurred.'));
-	if (! user_can_access_admin_page()) wp_die( gde_t('You do not have sufficient permissions to access this page') );
-
-	require(ABSPATH. '/wp-content/plugins/google-document-embedder/options.php');
-	add_action('in_admin_footer', 'gde_admin_footer');
-}
-
-// add additional links, for convenience
-$plugin = plugin_basename(__FILE__);
-function gde_actlinks($links) { 
-	$settings_link = '<a href="options-general.php?page=gviewer.php">Settings</a>'; 
-	array_unshift($links, $settings_link); 
-	return $links; 
-}
-function gde_metalinks($links, $file) {
-	global $debug;
-	$plugin = plugin_basename(__FILE__);
-	if ($file == $plugin) {
-		$support_link = '<a href="'.GDE_SUPPORT_URL.'">Support</a>';
-		$links[] = $support_link;
-	}
-	return $links;
-}
-add_filter("plugin_action_links_$plugin", 'gde_actlinks');
-add_filter("plugin_row_meta", 'gde_metalinks', 10, 2);
-
-// check for beta, if enabled
-function gde_checkforBeta($plugin) {
-	global $gde_ver, $pUrl, $gdeoptions;
-	
-	$pdata = get_plugin_data(__FILE__);
-	if (preg_match('/-dev$/i', $pdata['Version'])) { $isbeta = 1; }
-	
-	if (strpos($pUrl.'/gviewer.php', $plugin) !== false) {
-		if ($gdeoptions['suppress_beta'] !== "yes") {
-			$vcheck = wp_remote_fopen(GDE_BETA_CHKFILE);
-		}
-		if ($vcheck) {
-			$lver = $gde_ver;
-			
-			$status = explode('@', $vcheck);
-			$rver = $status[1];
-			$message = $status[3];
-			
-			if ($isbeta) {
-				$titleStr = "Updated beta";
-				$msgStr = "A newer beta has been released. Please deactivate the plug-in and install the current version. Thanks for your help!";
-			} else {
-				$titleStr = "Beta";
-				$msgStr = "Please deactivate the plug-in and install the current version if you wish to participate. Otherwise, you can turn off beta version checking in GDE Settings. Testers appreciated!";
-			}
-			$message = str_replace("%msg", $msgStr, $message);
-			
-			if ((version_compare(strval($rver), strval($lver), '>') == 1)) {
-				$msg = __("$titleStr version available: ", "gde").'<strong>v'.$rver.'</strong> - '.$message;
-				echo '<td colspan="5" class="plugin-update" style="line-height:1.2em; font-size:11px; padding:1px;"><div style="background:#A2F099;border:1px solid #4FE23F; padding:2px; font-weight:bold;">'.__("$titleStr version available.", "gde").' <a href="javascript:void(0);" onclick="jQuery(\'#gde-beta-msg\').toggle();">'.__("(more info)", "gde").'</a></div><div id="gde-beta-msg" style="display:none; padding:10px; text-align:center;" >'.$msg.'</div></td>';
-			} elseif ($isbeta) {
-				$msg = __("Thank you for running a test version of Google Doc Embedder. You are running the most current beta version. Please give feedback on this version using the &quot;Support&quot; link above. Thanks for your help!", "gde");
-				echo '<td colspan="5" class="plugin-update" style="line-height:1.2em; font-size:11px; padding:1px;"><div style="border:1px solid; padding:2px; font-weight:bold;">'.__("You're running a beta version. Please give feedback.", "gde").' <a href="javascript:void(0);" onclick="jQuery(\'#gde-beta-msg\').toggle();">'.__("(more info)", "gde").'</a></div><div id="gde-beta-msg" style="display:none; padding:10px; text-align:center;" >'.$msg.'</div></td>';
-			} else {
-				return;
-			}
-		} elseif ($isbeta) {
-			$msg = __("Thank you for running a test version of Google Doc Embedder. You are running the most current beta version. Please give feedback on this version using the &quot;Support&quot; link above. Thanks for your help!", "gde");
-			echo '<td colspan="5" class="plugin-update" style="line-height:1.2em; font-size:11px; padding:1px;"><div style="border:1px solid; padding:2px; font-weight:bold;">'.__("You're running a beta version. Please give feedback.", "gde").' <a href="javascript:void(0);" onclick="jQuery(\'#gde-beta-msg\').toggle();">'.__("(more info)", "gde").'</a></div><div id="gde-beta-msg" style="display:none; padding:10px; text-align:center;" >'.$msg.'</div></td>';			
-		}
+	$table = $wpdb->base_prefix . 'gde_dx_log';
+	if ( is_multisite() ) {
+		$blogid = get_current_blog_id();
+		$wpdb->query("DELETE FROM $table WHERE blogid = '$blogid'");
+	} else {
+		$wpdb->query("DROP TABLE IF EXISTS $table");
 	}
 }
-add_action('after_plugin_row', 'gde_checkforBeta');
 
-// activate shortcode
-add_shortcode('gview', 'gde_gviewer_func');
-
-// editor integration (experimental)
-if ($gdeoptions['disable_editor'] !== "yes") {
-	// add quicktag
-	add_action( 'admin_print_scripts', 'gde_admin_print_scripts' );
-	
-	// add tinymce button
-	add_action('admin_init','gde_mce_addbuttons');
-}
-
-// footer credit
-function gde_admin_footer() {
-	$pdata = get_plugin_data(__FILE__);
-	printf('%1$s plugin | Version %2$s<br />', $pdata['Title'], $pdata['Version']);
-}
-
-// temporarily move certain functions here to workaround NGG incompatibility
-function gde_t($message) {
-	return __($message, basename(dirname(__FILE__)));
+/**
+ * Actions to perform when plugins have finished loading (before init)
+ *
+ * @since   2.5.2.1
+ * @return  void
+ */
+function gde_load() {
+	// localization
+	load_plugin_textdomain( 'gde', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 }
 
 ?>

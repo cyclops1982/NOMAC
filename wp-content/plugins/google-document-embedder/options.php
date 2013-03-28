@@ -1,335 +1,393 @@
-﻿<?php
-include_once('gde-functions.php');
+<?php
 
 global $gdeoptions;
-$himg = plugins_url(plugin_basename(dirname(__FILE__))).'/img/help.png';
+$import = false;
 
-if(isset($_REQUEST['defaults'])) {
-
-	$set = gde_init('reset');
-	$gdeoptions = get_option('gde_options');
-	gde_showMessage("Options reset to defaults");
-
-} elseif(isset($_REQUEST['submit'])) {
-
-	// change user defaults
-	if(isset($_POST['show_dl'])) {
-		$gdeoptions['show_dl'] = "yes";
+// which form are we submitting (uses nonce for security and identification)
+if ( isset( $_POST['_general_default'] ) ) {
+	// updating default profile
+	$tabid = "gentab";
+	
+	if ( gde_form_to_profile( 1, $_POST ) ) {
+		// update successful
+		gde_show_msg( __('Default profile <strong>updated</strong>.', 'gde') );
 	} else {
-		$gdeoptions['show_dl'] = "no";
+		gde_show_msg( __('Unable to update profile.', 'gde'), true );
 	}
-	if(isset($_POST['restrict_dl'])) {
-		$gdeoptions['restrict_dl'] = "yes";
+} elseif ( isset( $_POST['_profiles_new'] ) ) {
+	// new profile creation
+	global $wpdb;
+	$tabid = "protab";
+	
+	if ( ! empty( $_POST['profile-name'] ) ) {
+		$name = preg_replace( "/[^A-Za-z0-9 -]/", '', trim( $_POST['profile-name'] ) );
+		$name = strtolower( str_replace( " ", "-", $name ) );
+		
+		if ( ! preg_match( '/[\pL]/u', $name ) ) {
+			// profile name doesn't contain any letter - possible ID conflict
+			gde_show_msg( __('Profile name must contain at least one letter.', 'gde'), true );
+		} elseif ( gde_profile_name_exists( $name ) !== -1 ) {
+			// profile name is duplicate
+			gde_show_msg( __('Profile name already exists. Please choose another name.', 'gde'), true );
+		} elseif ( gde_profile_to_profile( $_POST['parent'], $name, stripslashes( $_POST['description'] ) ) ) {
+			// intercept and redirect to edit profile page
+			$lastid = gde_profile_name_exists( $name );
+			$_POST['action'] = "edit";
+			$_POST['profile'] = $lastid;
+			$noload = "gentab";
+			gde_show_msg( __('New profile <strong>created</strong>.', 'gde') );
+		} else {
+			gde_show_msg( __('Unable to create profile.', 'gde'), true );
+		}
 	} else {
-		$gdeoptions['restrict_dl'] = "no";
+		gde_show_msg( __('Unable to create profile.', 'gde'), true );
 	}
-	if(isset($_POST['enable_ga'])) {
-		$gdeoptions['enable_ga'] = "yes";
+} elseif ( isset( $_POST['_profile_edit'] ) ) {
+	// profile edit
+	$tabid = "protab";
+	
+	if ( gde_form_to_profile( $_POST['profile_id'], $_POST ) ) {
+		// update successful
+		gde_show_msg( __('Profile <strong>updated</strong>.', 'gde') );
 	} else {
-		$gdeoptions['enable_ga'] = "no";
+		gde_show_msg( __('Unable to update profile.', 'gde'), true );
 	}
-	if(isset($_POST['default_width'])) {
-		$neww = $_POST['default_width'];
-		if (strlen($neww) > 0) $gdeoptions['default_width'] = gde_sanitizeOpt($neww, $_POST['width_type']);
+} elseif ( isset( $_POST['action'] ) && isset( $_POST['profile'] ) ) {
+	// profile row action
+	
+	if ( $_POST['action'] == "delete" ) {
+		$tabid = "protab";
+		if ( gde_delete_profile( $_POST['profile'] ) ) {
+			gde_show_msg( __('Profile <strong>deleted</strong>.', 'gde') );
+		} else {
+			gde_show_msg( __('Unable to delete profile.', 'gde'), true );
+		}
+	} elseif ( $_POST['action'] == "default" ) {
+		$tabid = "gentab";
+		if ( gde_overwrite_profile( $_POST['profile'] ) ) {
+			gde_show_msg( __('Default profile <strong>updated</strong>.', 'gde') );
+		}
+	} elseif ( $_POST['action'] == "edit" ) {
+		$tabid = "protab";
+		$noload = "gentab";
 	}
-	if(isset($_POST['width_type'])) {
-		$gdeoptions['width_type'] = $_POST['width_type'];
-	}
-	if(isset($_POST['default_height'])) {
-		$newh = $_POST['default_height'];
-		if (strlen($newh) > 0) $gdeoptions['default_height'] = gde_sanitizeOpt($newh, $_POST['height_type']);
-	}
-	if(isset($_POST['height_type'])) {
-		$gdeoptions['height_type'] = $_POST['height_type'];
-	}
-	if(isset($_POST['default_lang'])) {
-		$gdeoptions['default_lang'] = $_POST['default_lang'];
-	}
-	//if(isset($_POST['gdet_i'])) { $newgdet .= "i"; } // no longer visible in standard viewer
-	//if(isset($_POST['gdet_p'])) { $newgdet .= "p"; }
-	if(isset($_POST['gdet_z'])) { $newgdet .= "z"; }
-	if(isset($_POST['gdet_n'])) { $newgdet .= "n"; }
-	$gdeoptions['restrict_tb'] = $newgdet;
-	if(isset($_POST['link_text'])) {
-		$newt = $_POST['link_text'];
-		if (strlen(utf8_decode($newt))) $gdeoptions['link_text'] = $newt;
-	}
-	if(isset($_POST['link_pos'])) {
-		$gdeoptions['link_pos'] = $_POST['link_pos'];
-	}
-	if(isset($_POST['link_func'])) {
-		$gdeoptions['link_func'] = $_POST['link_func'];
-	}
-	if(isset($_POST['disable_proxy'])) {
-		$gdeoptions['disable_proxy'] = $_POST['disable_proxy'];
-	}
-	if(isset($_POST['disable_editor'])) {
-		$gdeoptions['disable_editor'] = "yes";
-	} else {
-		$gdeoptions['disable_editor'] = "no";
-	}
-	if(isset($_POST['disable_caching'])) {
-		$gdeoptions['disable_caching'] = "yes";
-	} else {
-		$gdeoptions['disable_caching'] = "no";
-	}
-	if(isset($_POST['bypass_check'])) {
-		$gdeoptions['bypass_check'] = "yes";
-	} else {
-		$gdeoptions['bypass_check'] = "no";
-	}
-	if(isset($_POST['suppress_beta'])) {
-		$gdeoptions['suppress_beta'] = "yes";
-	} else {
-		$gdeoptions['suppress_beta'] = "no";
+} elseif ( isset( $_POST['_advanced'] ) ) {
+	// updated advanced options (global)
+	$tabid = "advtab";
+	
+	// keep old options for a moment
+	$oldoptions = $gdeoptions;
+	
+	// initialize checkbox values (values if options unchecked)
+	$gdeoptions['ed_disable'] = "no";
+	$gdeoptions['ed_embed_sc'] = "no";
+	$gdeoptions['ed_extend_upload'] = "no";
+	$gdeoptions['error_display'] = "no";
+	$gdeoptions['error_check'] = "no";
+	$gdeoptions['error_log'] = "no";
+	
+	foreach ( $_POST as $k => $v ) {
+		if ( $k == "ed_disable" ) {
+			$gdeoptions[$k] = "yes";
+		} elseif ( $k == "ed_embed_sc" ) {
+			$gdeoptions[$k] = "yes";
+		} elseif ( $k == "ed_extend_upload" ) {
+			$gdeoptions[$k] = "yes";
+		} elseif ( $k == "error_display" ) {
+			$gdeoptions[$k] = "yes";
+		} elseif ( $k == "error_check" ) {
+			$gdeoptions[$k] = "yes";
+		} elseif ( $k == "error_log" ) {
+			$gdeoptions[$k] = "yes";
+			if ( ! isset( $oldoptions['error_log'] ) || $oldoptions['error_log'] == "no" ) {
+				if ( ! gde_dx_log("Diagnostic logging enabled") ) {
+					// can't write to db - don't enable logging
+					gde_show_msg( __('Unable to enable diagnostic logging.', 'gde'), true );
+					$gdeoptions[$k] = "no";
+				}
+			}
+		} elseif ( array_key_exists( $k, $gdeoptions ) ) {
+			// all fields where name == settings key
+			$gdeoptions[$k] = stripslashes( $v );
+		}
 	}
 	
-	update_option('gde_options', $gdeoptions);
-	gde_showMessage("Options updated");
+	if ( update_option( 'gde_options', $gdeoptions ) ) {
+		// update successful
+		gde_show_msg( __('Settings <strong>updated</strong>.', 'gde') );
+	} else {
+		gde_show_msg( __('Settings <strong>updated</strong>.', 'gde') );	// not true, but avoids confusion in case where no changes were made
+		gde_dx_log('Settings update failed - maybe no changes');
+	}
+} elseif ( isset( $_POST['_advanced_import'] ) ) {
+	$valid = false;
+	
+	// check import file validity
+	if ( isset( $_FILES['import'] ) && ! empty( $_FILES['import'] ) ) {
+		if ( $_FILES['import']['size'] > 0  && is_uploaded_file( $_FILES['import']['tmp_name'] ) && preg_match( '/json$/i', $_FILES['import']['type'] ) ) {
+			// file OK, check for json content
+			$json = json_decode( file_get_contents( $_FILES['import']['tmp_name'] ), true );
+			if ( $json !== null && is_array( $json ) ) {
+				// check for supported content
+				if ( isset( $json['profiles'] ) || isset( $json['settings'] ) || isset( $json[0]['profile_id'] ) || isset( $json['ed_disable'] ) ) {
+					$valid = true;
+				}
+			}
+		}
+	}
+	
+	if ( ! $valid ) {
+		$tabid = "advtab";
+		gde_show_msg( __('Please select a valid export file to import.', 'gde'), true );
+	} else {
+		// process and import
+		$import = true;
+		$noload = "gentab";
+		gde_import( $json );
+	}
 }
+
+// maintain tab on form submission
+if ( isset( $tabid ) && ! isset( $noload ) ) {
 ?>
+
+<script type="text/javascript">
+	jQuery(document).ready(function() {
+		jQuery('#<?php echo $tabid; ?>').click();
+	});
+</script>
+
+<?php
+}
+
+if ( ! $import ) {
+?>
+
 <div class="wrap">
+	<div class="icon32" id="icon-options-general"></div>
+	<h2>Google Doc Embedder <?php _e('Settings', 'gde'); ?></h2>
+	
+	<div id="gdeadmintabs" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
+		<ul class="nav-tab-wrapper ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
 <?php
-echo "<h2>".__('Google Doc Embedder Settings')."</h2>";
+	if ( ! isset( $noload ) ) {
 ?>
-
-<form action="" method="post">
-<?php wp_nonce_field('update-options'); ?>
-
-<div id="poststuff" class="metabox-holder">
-	<div class="sm-padded" >
-		<div id="post-body-content" class="has-sidebar-content">
-			<div class="meta-box-sortabless">
-				<div id="gde_vieweroptions" class="postbox">
-
-				<h3 class="hndle"><span>Viewer Options</span></h3>
-				<div class="inside">
-				
-				<table class="form-table">
-<tr valign="top">
-<th scope="row">Viewer Selection</th>
-<td><div style="float:right;"><a href="<?php echo GDE_VIEWOPT_URL; ?>" target="_blank" title="Help"><img src="<?php echo $himg; ?>"></a></div>
+			<li id="gentab" class="ui-state-default ui-corner-top ui-tabs-selected ui-state-active">
+				<a href="#general" class="nav-tab">
+					<span><?php _e('General', 'gde'); ?></span>
+				</a>
+			</li>
+			<li id="protab" class="ui-state-default ui-corner-top">
+				<a href="#profiles" class="nav-tab">
+					<span><?php _e('Profiles', 'gde'); ?></span>
+				</a>
+			</li>
 <?php
-	$event = " onclick=\"if(document.getElementById('tbedit').style.display == 'none'){ document.getElementById('tbedit').style.display = 'block'; }else{ document.getElementById('tbedit').style.display = 'none'; }\"";
-	gde_showRadio('yes', 'dp2', 'disable_proxy', gde_t('Google Standard Viewer'), $event); ?><br />
-<em>Embed the standard Google Viewer.</em><br/>
-<?php gde_showRadio('no', 'dp1', 'disable_proxy', gde_t('Enhanced Viewer'), $event); unset($event); ?><br />
-<em>Use this option to enable toolbar customization and fix some display problems (experimental).</em><br/>
-</td>
-</tr>
-<tr valign="top">
-<th scope="row">Default Size</th>
-<td><strong>Width </strong><input type="text" size="5" name="default_width" value="<?php echo $gdeoptions['default_width']; ?>" />  <select name="width_type">
-<?php gde_showOption('px', 'width_type', gde_t('px')); ?>
-<?php gde_showOption('pc', 'width_type', gde_t('%')); ?>
-</select> &nbsp;&nbsp;&nbsp;&nbsp;
-<strong>Height </strong><input type="text" size="5" name="default_height" value="<?php echo $gdeoptions['default_height']; ?>" /> <select name="height_type">
-<?php gde_showOption('px', 'height_type', gde_t('px')); ?>
-<?php gde_showOption('pc', 'height_type', gde_t('%')); ?>
-</select></td>
-</tr>
-<tr valign="top">
-<th scope="row">Default Language</th>
-<td><select name="default_lang">
-
-<?php gde_showOption('cs', 'default_lang', gde_t('&#268;esky')); ?>
-<?php gde_showOption('sr', 'default_lang', gde_t('&#x0421;&#x0440;&#x043F;&#x0441;&#x043A;&#x0438;')); ?>
-<?php gde_showOption('uk', 'default_lang', gde_t('&#x0423;&#x043A;&#x0440;&#x0430;&#x0457;&#x043D;&#x0441;&#x044C;&#x043A;&#x0430;')); ?>
-<?php gde_showOption('el', 'default_lang', gde_t('&Epsilon;&lambda;&lambda;&eta;&nu;&iota;&kappa;ά')); ?>
-<?php gde_showOption('ar', 'default_lang', gde_t('Arabic')); ?>
-<?php gde_showOption('in', 'default_lang', gde_t('Bahasa Indonesia')); ?>
-<?php gde_showOption('ca', 'default_lang', gde_t('Catal&agrave;')); ?>
-<?php gde_showOption('da', 'default_lang', gde_t('Dansk')); ?>
-<?php gde_showOption('de', 'default_lang', gde_t('Deutsch')); ?>
-<?php gde_showOption('en_GB', 'default_lang', gde_t('English (UK)')); ?>
-<?php gde_showOption('en_US', 'default_lang', gde_t('English (US)')); ?>
-<?php gde_showOption('es', 'default_lang', gde_t('Espa&ntilde;ol')); ?>
-<?php gde_showOption('fil', 'default_lang', gde_t('Filipino')); ?>
-<?php gde_showOption('fr', 'default_lang', gde_t('Fran&ccedil;ais')); ?>
-<?php gde_showOption('iw', 'default_lang', gde_t('Hebrew')); ?>
-<?php gde_showOption('hr', 'default_lang', gde_t('Hrvatski')); ?>
-<?php gde_showOption('it', 'default_lang', gde_t('Italiano')); ?>
-<?php gde_showOption('lv', 'default_lang', gde_t('Latvie&scaron;u')); ?>
-<?php gde_showOption('lt', 'default_lang', gde_t('Lietuvių')); ?>
-<?php gde_showOption('hu', 'default_lang', gde_t('Magyar')); ?>
-<?php gde_showOption('nl', 'default_lang', gde_t('Nederlands')); ?>
-<?php gde_showOption('no', 'default_lang', gde_t('Norsk (bokmål)')); ?>
-<?php gde_showOption('pl', 'default_lang', gde_t('Polski')); ?>
-<?php gde_showOption('pt_BR', 'default_lang', gde_t('Portugu&ecirc;s (Brasil)')); ?>
-<?php gde_showOption('pt_PT', 'default_lang', gde_t('Portugu&ecirc;s (Portugal)')); ?>
-<?php gde_showOption('ro', 'default_lang', gde_t('Rom&acirc;n&#x0103;')); ?>
-<?php gde_showOption('sl', 'default_lang', gde_t('Sloven&#x0161;&#x010D;ina')); ?>
-<?php gde_showOption('sk', 'default_lang', gde_t('Slovensk&yacute;')); ?>
-<?php gde_showOption('fi', 'default_lang', gde_t('Suomi')); ?>
-<?php gde_showOption('sv', 'default_lang', gde_t('Svenska')); ?>
-<?php gde_showOption('tr', 'default_lang', gde_t('T&uuml;rk&ccedil;e')); ?>
-<?php gde_showOption('vi', 'default_lang', gde_t('Tiếng Việt')); ?>
-<?php gde_showOption('ru', 'default_lang', gde_t('Русский')); ?>
-<?php gde_showOption('bg', 'default_lang', gde_t('български')); ?>
-<?php gde_showOption('mr', 'default_lang', gde_t('मराठी')); ?>
-<?php gde_showOption('hi', 'default_lang', gde_t('हिन्दी')); ?>
-<?php gde_showOption('bn', 'default_lang', gde_t('বাংলা')); ?>
-<?php gde_showOption('gu', 'default_lang', gde_t('ગુજરાતી')); ?>
-<?php gde_showOption('or', 'default_lang', gde_t('ଓଡିଆ')); ?>
-<?php gde_showOption('ta', 'default_lang', gde_t('தமிழ்')); ?>
-<?php gde_showOption('te', 'default_lang', gde_t('తెలుగు')); ?>
-<?php gde_showOption('kn', 'default_lang', gde_t('ಕನ್ನಡ')); ?>
-<?php gde_showOption('ml', 'default_lang', gde_t('മലയാളം')); ?>
-<?php gde_showOption('th', 'default_lang', gde_t('ภาษาไทย')); ?>
-<?php gde_showOption('zh_CN', 'default_lang', gde_t('中文（简体）')); ?>
-<?php gde_showOption('zh_TW', 'default_lang', gde_t('中文（繁體）')); ?>
-<?php gde_showOption('ja', 'default_lang', gde_t('日本語')); ?>
-<?php gde_showOption('ko', 'default_lang', gde_t('한국어')); ?>
-
-</select></td>
-</tr>
-</table>
-<?php
-if ($gdeoptions['disable_proxy'] == "no") {
-	// enhanced viewer is selected, show opts by default
-	$display = "block";
-} else {
-	// hide opts by default
-	$display = "none";
-}
+	} else {
 ?>
-<div id="tbedit" style="display:<?php echo $display; ?>">
-<table class="form-table">
-<tr valign="top">
-<th scope="row">Hide Toolbar Buttons</th>
-<td><?php //gde_showCheckTb('gdet_i', gde_t('Google Logo')); ?>
-<?php //gde_showCheckTb('gdet_p', gde_t('Single/Double Page View')); ?>
-<?php gde_showCheckTb('gdet_z', gde_t('Zoom In/Out')); ?> &nbsp;&nbsp;
-<?php gde_showCheckTb('gdet_n', gde_t('Open in New Window')); ?>
-</td>
-</tr>
-</table>
-</div>
+			<li id="gentab-reload" class="ui-state-default ui-corner-top">
+				<a href="#general" class="nav-tab">
+					<span><?php _e('General', 'gde'); ?></span>
+				</a>
+			</li>
+			<li id="protab" class="ui-state-default ui-corner-top ui-tabs-selected ui-state-active">
+				<a href="#profiles" class="nav-tab">
+					<span><?php _e('Profiles', 'gde'); ?></span>
+				</a>
+			</li>
+<?php
+	}
+?>
+			<li id="advtab" class="ui-state-default ui-corner-top">
+				<a href="#advanced" class="nav-tab">
+					<span><?php _e('Advanced', 'gde'); ?></span>
+				</a>
+			</li>
+			<li id="suptab" class="ui-state-default ui-corner-top">
+				<a href="#support" class="nav-tab">
+					<span><?php _e('Support', 'gde'); ?></span>
+				</a>
+			</li>
+		</ul>
+	</div>
+	
+	<div id="gde-tabcontent">
+<?php
+	if ( ! isset( $noload ) ) {
+?>
+		<div id="gencontent" class="gde-tab gde-tab-active">
+			<?php gde_show_tab('general'); ?>
+		</div>
 		
-				</div>
-				</div>
-				</div>
+		<div id="procontent" class="gde-tab">
+			<?php gde_show_tab('profiles'); ?>
+		</div>
+		
+<?php
+	} else {
+		// don't load gentab content if this is a profile edit (avoid js conflicts)
+?>
+		<div id="gencontent" class="gde-tab"></div>
+		
+		<div id="procontent" class="gde-tab gde-tab-active">
+			<?php gde_show_tab('profiles'); ?>
+		</div>
+<?php
+	}
+?>
+		
+		<div id="advcontent" class="gde-tab">
+			<?php gde_show_tab('advanced'); ?>
+		</div>
 
-
-<div id="gde_linkoptions" class="postbox">
-
-				<h3 class="hndle"><span>Download Link Options</span></h3>
-				<div class="inside">
-<table class="form-table">
-<tr valign="top">
-<td colspan="2"><div style="float:right;"><a href="<?php echo GDE_LINKOPT_URL; ?>" target="_blank" title="Help"><img src="<?php echo $himg; ?>"></a></div><?php gde_showCheck('show_dl', gde_t('Display the download link by default')); ?><br/>
-<?php gde_showCheck('restrict_dl', gde_t('Only display download link to logged in users')); ?><br/>
-<?php gde_showCheck('enable_ga', gde_t('Track downloads in Google Analytics (tracking script must be installed on your site)')); ?></td>
-</tr>
-<tr valign="top">
-<th scope="row">Link Text</th>
-<td><input type="text" size="50" name="link_text" value="<?php echo $gdeoptions['link_text']; ?>" /><br/>
-<em>You can further customize text using these dynamic replacements:</em><br/>
-<code>%FN</code> : filename &nbsp;&nbsp;&nbsp;
-<code>%FT</code> : file type &nbsp;&nbsp;&nbsp;
-<code>%FS</code> : file size</td>
-</tr>
-<tr valign="top">
-<th scope="row">Link Position</th>
-<td><select name="link_pos">
-<?php gde_showOption('above', 'link_pos', gde_t('Above Viewer')); ?>
-<?php gde_showOption('below', 'link_pos', gde_t('Below Viewer')); ?>
-</select>
-</td>
-</tr>
-<tr valign="top">
-<th scope="row">Link Behavior</th>
-<td><select name="link_func">
-<?php gde_showOption('default', 'link_func', gde_t('Browser Default')); ?>
-<?php gde_showOption('force', 'link_func', gde_t('Force Download')); ?>
-<?php gde_showOption('force-mask', 'link_func', gde_t('Force Download (Mask URL)')); ?>
-</select>
-</td>
-</tr>
-<tr valign="top">
-<td colspan="2">
-</div></td>
-</tr>
-</tr>
-</table>
-				</div>
-				</div>
-			</div>
+		<div id="supcontent" class="gde-tab">
+			<?php gde_show_tab('support'); ?>
 		</div>
 	</div>
-				
-<p class="submit" style="padding-bottom:10px;">
-<div style="font-size:11px;margin-top:-40px;padding-bottom:20px;padding-left:5px;">
-<strong><a style="text-decoration:none;" href="javascript:;" onmousedown="if(document.getElementById('advopt').style.display == 'none'){ document.getElementById('advopt').style.display = 'block'; }else{ document.getElementById('advopt').style.display = 'none'; }">[ + ]</a> Advanced Options</strong> <a href="<?php echo GDE_ADVOPT_URL; ?>" target="_blank"><img src="<?php echo $himg; ?>"></a><br />
-<div id="advopt" style="display:none;">
-<?php gde_showCheck('disable_editor', gde_t('Disable editor integration')); ?><br />
-<?php gde_showCheck('bypass_check', gde_t('Disable internal error checking')); ?><br />
-<?php gde_showCheck('disable_caching', gde_t('Disable caching (frequently overwritten files)')); ?><br />
-<?php gde_showCheck('suppress_beta', gde_t('Disable beta version notifications')); ?>
-</div>
+	
 </div>
 
-<input type="hidden" id="user-id" name="user_ID" value="<?php echo (int) $user_ID ?>" />
-<span id="autosave"></span>
-<input class="button-primary" type="submit" name="submit" value="<?php gde_e('Save Options') ?>" />
-&nbsp;&nbsp;&nbsp;
-<input class="button-secondary" type="submit" name="defaults" value="<?php gde_e('Reset to Defaults') ?>" onClick="javascript:return confirm('Are you sure you want to reset all settings to defaults?')" />
-</p>
-
-</form>
-
-</div>
-
-<?php
-
-function gde_showRadio($value, $id, $option, $title, $event = NULL) {
-	global $gdeoptions;
-	if ($gdeoptions[$option] == $value) { $chk = ' checked="checked"'; }
-?>
-<input type="radio" name="<?php echo $option; ?>" value="<?php echo $value; ?>" id="<?php echo $id; ?>"<?php echo $chk; echo $event; ?> />
-<label for="<?php echo $id; ?>"><strong><?php gde_e($title) ?></strong></label>
 <?php
 }
 
-function gde_showCheck($option, $title, $link = NULL) {
+function gde_opts_checkbox( $field, $label, $wrap = '', $br = '', $disabled = false ) {
 	global $gdeoptions;
-	if ($gdeoptions[$option] == "yes") { $chk = ' checked="checked"'; }
-?>
-<input type="checkbox" name="<?php echo $option; ?>" value="1" id="<?php echo $option; ?>"<?php echo $chk; ?> />
-<label for="<?php echo $option; ?>"><?php gde_e($title) ?></label>
-<?php
-	if ($link) {
-		echo ' (<a href="'.$link.'" target="_blank">info</a>)';
+	
+	if ( ! empty( $wrap ) ) {
+		echo '<span id="'.$wrap.'">';
+	}
+	echo '<input type="checkbox" id="'.$field.'" name="'.$field.'"';
+	if ( ( isset( $gdeoptions[$field] ) && $gdeoptions[$field] == "yes" ) || ( $disabled ) ) {
+		echo ' checked="checked"';
+	}
+	if ( $disabled ) {
+		// used only for dx logging option due to global override in functions.php
+		echo ' disabled="disabled"';
+	}
+	
+	echo ' value="'.$field.'"> <label for="'.$field.'">'.$label.'</label>';
+	if ( ! empty( $br ) ) {
+		echo '<br/>';
+	}
+	if ( ! empty( $wrap ) ) {
+		echo '</span>';
 	}
 }
 
-function gde_showCheckTb($option, $title) {
-	global $gdeoptions;
-	$gdet = $gdeoptions['restrict_tb'];
-	
-	$option = str_replace("gdet_", "", $option);
-	
-	if (strstr($gdet, $option) !== false) { $chk = ' checked="checked"'; }
-?>
-<input type="checkbox" name="gdet_<?php echo $option; ?>" value="1" id="gdet_<?php echo $option; ?>"<?php echo $chk; ?> />
-<label for="gdet_<?php echo $option; ?>"><?php gde_e($title) ?></label>
-<?php
+function gde_profile_option( $option, $value, $label, $helptext = '' ) {
+	echo "<option value=\"$value\"";
+	if ( ! empty( $helptext ) ) {
+		echo " title=\"$helptext\"";
+	}
+	if ( $option == $value ) {
+		echo ' selected="selected"';
+	}
+	echo ">$label &nbsp;</option>\n";
 }
 
-function gde_showOption($value, $option, $title) {
-	global $gdeoptions;
-	if ($gdeoptions[$option] == $value) { $chk = ' selected="yes"'; }
-?>
-<option value="<?php echo $value; ?>"<?php echo $chk; ?>><?php echo $title; ?></option>
-<?php
+function gde_profile_checkbox( $option, $field, $label, $wrap = '', $br = '' ) {
+	if ( ! empty( $wrap ) ) {
+		echo '<span id="'.$wrap.'">';
+	}
+	echo '<input type="checkbox" id="'.$field.'" name="'.$field.'"';
+	
+	// toolbar items
+	if ( substr( $field, 0, 5 ) == "gdet_" ) {
+		if ( $field == "gdet_h" && strstr( $option, str_replace( "gdet_", "", $field ) ) ) {
+			echo ' checked="checked"';
+		} elseif ( $field !== "gdet_h" && ! strstr( $option, str_replace( "gdet_", "", $field ) ) ) {
+			echo ' checked="checked"';
+		}
+	// open in new window
+	} elseif ( $field == "fs_win" && $option !== "same" ) {
+		echo ' checked="checked"';
+	// logged-in users only
+	} elseif ( $field == "fs_user" && $option == "yes" ) {
+		echo ' checked="checked"';
+	// allow print
+	} elseif ( $field == "fs_print" && $option !== "no" ) {
+		echo ' checked="checked"';
+	// content area options
+	} elseif  ( substr( $field, 0, 5 ) == "gdev_" ) {
+		if ( strstr( $option, str_replace( "gdev_", "", $field ) ) ) {
+			echo ' checked="checked"';
+		}
+	// doc security options
+	} elseif ( $field == "force" && $option !== "no" ) {
+		echo ' checked="checked"';
+	} elseif ( $field == "mask" && $option !== "no" ) {
+		echo ' checked="checked"';
+	} elseif ( $field == "block" && $option !== "no" ) {
+		echo ' checked="checked"';
+	}
+	
+	echo ' value="'.$field.'"> <label for="'.$field.'">'.$label.'</label>';
+	if ( ! empty( $br ) ) {
+		echo '<br/>';
+	}
+	if ( ! empty( $wrap ) ) {
+		echo '</span>';
+	}
 }
 
-function gde_showMessage($message, $type='updated') {
-	if($type == 'updated') $class = 'updated fade';
-	elseif($type == 'error') $class = 'updated error';
-	else $class = $type;
+function gde_profile_text( $option, $field, $class = '', $size = '', $enabled = true ) {
+	echo '<input type="text" id="'.$field.'" name="'.$field.'" value="'.$option.'"';
+	if ( ! empty( $class ) ) {
+		echo ' class="'.$class.'"';
+	}
+	if ( ! empty( $size ) ) {
+		echo ' size="'.$size.'"';
+	}
+	if ( $enabled === false ) {
+		echo ' disabled="disabled"';
+		echo ' style="color:#aaa;background-color:#eee;"';
+	}
+	echo ">";
+}
+
+function gde_help_link( $url, $float = '' ) {
+	$title = __('Help', 'gde');
+	$img = GDE_PLUGIN_URL . "img/help.png";
 	
-	print '<div id="message" class="'.$class.'"><p>' . __($message, basename(dirname(__FILE__))) . '</p></div>';
+	if ( ! empty( $float ) ) {
+		echo '<div style="float:'.$float.';">';
+	}
+	
+	echo '<a href="'.$url.'" target="_blank" title="'.$title.'"><img src="'.$img.'" alt="?"></a>';
+	
+	if ( ! empty( $float ) ) {
+		echo "</div>\n";
+	}
+}
+
+function gde_row_cb( $pid ) {
+	// default profile
+	if ( $pid == 1 ) {
+		return " ";
+	} else {
+		return '<input type="checkbox" value="'.$pid.'" name="delete_tags[]">';
+	}
+}
+
+function gde_row_actions( $pid ) {
+	$actions = array(
+		// action name	=>	arr ( label, class )
+		"edit"		=>	array( __('Edit', 'gde'), 'edit' ),
+		"delete"	=>	array( __('Delete', 'gde'), 'delete' ),
+		"default"	=>	array( __('Make Default', 'gde'), 'default' )
+	);
+	
+	// protect default profile
+	if ( $pid == 1 ) {
+		unset( $actions['delete'], $actions['default'] );
+	}
+	
+	foreach ($actions as $k => $v) {
+		$act[] = '<span class="'.$v[1].'" id="'.$k.'-'.$pid.'"><a href="options-general.php?page=gde-settings">'.$v[0].'</a></span>';
+	}
+	$acts = implode( " | ", $act );
+	
+	return $acts;
 }
 
 ?>
