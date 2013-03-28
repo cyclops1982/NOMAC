@@ -15,7 +15,6 @@ wp-config.php
 wp-content/gallery/
 wp-content/index.php
 wp-content/languages/
-wp-content/plugins/akismet/
 wp-content/plugins/capsman/
 wp-content/plugins/contact-form-7/
 wp-content/plugins/google-document-embedder/
