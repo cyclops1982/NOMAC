@@ -1,4 +1,5 @@
 wp-config.php
+wp-content/plugins/nomac/imagecache/
 wp-content/plugins/hello.php
 wp-content/themes/NOMAC.tar.gz
 wp-content/themes/twentyeleven/

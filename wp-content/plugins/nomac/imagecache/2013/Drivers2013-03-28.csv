@@ -1,3 +1,0 @@
-Id,Voornaam,Achternaam,Straat,HuisNr,PostCode,Woonplaats,GeboorteDatum,TelefoonNr,Email,LidBijClub,Freq1,Freq2,Transponder,VorigeLicentieNr,Klasse,Bedrag,Status,Year,RegistrationDate,foto,fotoContentType,Freq3,Transponder2,ClassName
-39,Geen,Amca,Test,1,1234AA,GeenAmcaKiezen,2009-01-10,,cyclops+nomac@prof-x.net,ERCE,27.145MHz,,1234567,,BC05-NK,80,Verwijderd,2013,"2013-03-28 15:42:40",,,"Brandstof 1:5 - NK"
-38,Ruben,d'Arco,julianastraat,71,"3905 EL",Veenendaal,1981-06-29,,cyclops+nomac@prof-x.net,AMCA,27.045MHz,27.095MHz,12345678,,BC10-NOMAC,90,"Betaling ontvangen",2013,"2013-03-28 15:38:31",27.145MHz,987654321,"Brandstof 1:10 200mm - NOMAC"
