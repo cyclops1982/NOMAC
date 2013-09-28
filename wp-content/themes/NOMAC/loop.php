@@ -89,7 +89,7 @@ function permalink($title="") {
 		{
 			continue;
 		}
-		echo '<div class="postsummary" id="post-'.get_the_ID().'" class="'.get_post_class().'">';
+		echo '<div class="postsummary" id="post-'.get_the_ID().'" class="'.implode(' ',get_post_class()).'">';
 		echo '<h2>';
 		permalink();
 		echo '</h2>';
