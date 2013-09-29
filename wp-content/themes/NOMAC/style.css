@@ -371,6 +371,15 @@ img.aligncenter {
 	display: block;
 }
 
+img.alignleft {
+	float: left;
+}
+
+img.alignright {
+	float: right;
+}
+
+
 img {
 }
 
