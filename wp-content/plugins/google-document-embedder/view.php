@@ -179,7 +179,7 @@ if ( isset( $_GET['a'] ) && $_GET['a'] == 'gt') {
 		}
 		
 		// hide selection of text
-		if (strstr($vw, 'x')) {
+		if ( strstr( $vw, 'x' ) ) {
 			$search[] = 'class="page-image';
 			$replace[] = 'class="page-image noselect';
 			$newstyles[] = ".rubberband { display: none; }";
@@ -224,6 +224,26 @@ if ( isset( $_GET['a'] ) && $_GET['a'] == 'gt') {
 			$cssblock = '<link rel="stylesheet" type="text/css" href="'.$css."\">\n</head>";
 			$search[] = "</head>";
 			$replace[] = $cssblock;
+		}
+		
+		// override right-click behavior (if link is private)
+		if ( $profile['link_block'] == "yes" ) {
+			$search[] = "<body";
+			$replace[] = '<body oncontextmenu="return false;"';
+			$search[] = "</body>";
+			$replace[] = '
+			<script type="text/javascript">
+				if (document.addEventListener) {
+					document.addEventListener(\'contextmenu\', function(e) {
+						e.preventDefault();
+					}, false);
+				} else {
+					document.attachEvent(\'oncontextmenu\', function() {
+						window.event.returnValue = false;
+					});
+				}
+			</script>
+			'."\n</body>";
 		}
 		
 		// override new window behavior
@@ -271,7 +291,7 @@ if ( isset( $_GET['a'] ) && $_GET['a'] == 'gt') {
  */
 function gde_get_contents( $url ) {
 	
-	$response = wp_remote_get( $url, array( 'sslverify' => false ) );
+	$response = wp_remote_get( $url, array( 'timeout' => 15, 'sslverify' => false ) );
 	
 	if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) != 200 ) {
 		gde_dx_log("Error retrieving document");
@@ -306,7 +326,7 @@ function gde_curl_get_contents( $url ) {
 	curl_setopt_array( $ch, array(
 	    CURLOPT_URL            => $url, 
 	    CURLOPT_RETURNTRANSFER => true,
-	    CURLOPT_CONNECTTIMEOUT => 5,	// same as HTTP API
+	    CURLOPT_CONNECTTIMEOUT => 15,	// HTTP API is 5, overridden in gde_get_contents to match this
 	    CURLOPT_SSL_VERIFYPEER => false
 	) );
 	$file_contents = curl_exec( $ch );
