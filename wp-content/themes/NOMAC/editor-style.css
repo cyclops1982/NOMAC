@@ -4,7 +4,7 @@ Description: Used to style the TinyMCE editor.
 */
 
 html .mceContentBody {
-	max-width: 584px;
+	max-width: 645px;
 }
 *, body {
 	font-family: Arial, Helvertica, Sans-Serif;
@@ -133,8 +133,22 @@ table th {
 }
 
 
+img.aligncenter {
+        margin: 1em auto 1em auto;
+        display: block;
+}
+
+img.alignleft {
+        float: left;
+        margin: 6px 6px 0px 0px;
+}
+
+img.alignright {
+        float: right;
+        margin: 6px 0px 6px 6px;
+}
 
 img {
-	border: 1px solid #ddd;
-	padding: 6px;
+        border: 1px solid #c9c9cb;
 }
+
