@@ -137,6 +137,10 @@ div.sidebar {
 	clear: both;
 }
 
+.content p {
+	margin-bottom: 1em;
+}
+
 
 .paging {
 	margin-top: 1em;
