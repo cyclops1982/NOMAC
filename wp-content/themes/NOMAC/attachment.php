@@ -65,8 +65,7 @@ if ( have_posts() )
 			
 			echo '<p class="attachment"><a href="' . $next_attachment_url . '" title="'.esc_attr( get_the_title()) .'" rel="attachment">';
 
-			$attachment_size = apply_filters( 'twentyten_attachment_size', 900 );
-			echo wp_get_attachment_image( $post->ID, array( $attachment_size, 9999 ) ); // filterable image width with, essentially, no limit for image height.
+			echo wp_get_attachment_image( $post->ID, array( 645, 9999 ) ); // filterable image width with, essentially, no limit for image height.
 			echo '</a></p>';
 			echo '<a href="'.wp_get_attachment_url() .'" title="'.esc_attr( get_the_title() ) .'" rel="attachment">'.basename( get_permalink() ).'</a>';
 		}
