@@ -2,9 +2,11 @@
 Contributors: takayukister
 Donate link: http://contactform7.com/donate/
 Tags: captcha
-Requires at least: 3.2
-Tested up to: 3.3.1
-Stable tag: 1.5
+Requires at least: 3.5
+Tested up to: 3.6
+Stable tag: 1.7
+License: GPLv2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Really Simple CAPTCHA is a CAPTCHA module intended to be called from other plugins. It is originally created for my Contact Form 7 plugin.
 
@@ -88,6 +90,17 @@ If you have any further questions, please submit them [to the support forum](htt
 1. screenshot-1.png
 
 == Changelog ==
+
+= 1.7 =
+
+* The required WordPress version changed to 3.5 and higher.
+* Remove spaces from response automatically as some users misthink there are spaces between letters.
+
+= 1.6 =
+
+* Bundled font changed to Gentium Basic 1.1.
+* Some workarounds for infrequently reported problems on Windows server.
+* Do temp file cleanup every time before generating CAPTCHA image.
 
 = 1.5 =
 
