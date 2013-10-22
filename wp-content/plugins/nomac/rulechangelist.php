@@ -14,11 +14,15 @@ function outputNomacRulechangeList($attrs) {
 		$out .= "The nomac rule change list needs a year parameter.";
 		return $out;
 	}
-    $year = (int)$attrs["year"];
+	$year = (int)$attrs["year"];
 
-	
-	$rows = $wpdb->get_results("SELECT RC.SubmittedBy, RC.SubmittedOn, C.Name AS Class, RC.Page, RC.Article, RC.OldText, RC.NewText, RC.Comment FROM $tRuleChange AS RC INNER JOIN $tClass AS C ON C.Code = RC.Class WHERE Year = $year AND deleted = 0 ORDER BY C.Code, RC.SubmittedOn");
-	
+	$rows = array();
+	if (isset($attrs["class"])) {
+		$rows = $wpdb->get_results("SELECT RC.SubmittedBy, RC.SubmittedOn, C.Name AS Class, RC.Page, RC.Article, RC.OldText, RC.NewText, RC.Comment FROM $tRuleChange AS RC INNER JOIN $tClass AS C ON C.Code = RC.Class WHERE Year = $year AND deleted = 0 AND C.Code = '".addSlashes($attrs["class"])."' ORDER BY C.Code, RC.SubmittedOn");
+	} else {
+		$rows = $wpdb->get_results("SELECT RC.SubmittedBy, RC.SubmittedOn, C.Name AS Class, RC.Page, RC.Article, RC.OldText, RC.NewText, RC.Comment FROM $tRuleChange AS RC INNER JOIN $tClass AS C ON C.Code = RC.Class WHERE Year = $year AND deleted = 0 ORDER BY C.Code, RC.SubmittedOn");
+	}	
+
 	if (count($rows) > 0) {
 		
 		$class = "";
