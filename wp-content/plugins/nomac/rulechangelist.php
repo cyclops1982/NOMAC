@@ -33,7 +33,7 @@ function outputNomacRulechangeList($attrs) {
 					$out .= "</table>";
 				}
 				$class = $row->Class;
-				$out .= '<h3 class="pagebreak">' . stripslashes($row->Class) . '</h3>';
+				$out .= '<h3 class="pagebreak" id="'.stripslashes($row->Class).'">' . stripslashes($row->Class) . '</h3></a>';
 				$out .= '<table class="nostyle">';
 				$i=0;
 			}
