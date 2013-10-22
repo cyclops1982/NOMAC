@@ -57,6 +57,7 @@ function licensing_handlePost($yearOfLicense) {
 	$insertData['Freq3'] = strip_tags($_REQUEST['freq3']);
 	$insertData['Transponder'] = strip_tags($_REQUEST['transponder']);
 	$insertData['Transponder2'] = strip_tags($_REQUEST['transponder2']);
+	$insertData['Transponder3'] = strip_tags($_REQUEST['transponder3']);
 	$insertData['VorigeLicentieNr'] = strip_tags($_REQUEST['vorigelicentienr']);
 	$insertData['Klasse'] = strip_tags($_REQUEST['klasse']);
 	$insertData['Bedrag'] = $bedrag;
@@ -81,6 +82,7 @@ function licensing_handlePost($yearOfLicense) {
 				'%s', //Freq3
 				'%s', //Transponder1
 				'%s', //Transponder2
+				'%s', //Transponder3
 				'%s', //VorigeLicentieNr
 				'%s', //Klasse
 				'%d', //Bedrag
@@ -349,15 +351,27 @@ function licensing_outputForm($y) {
 	$out .= '<tr>';
 	$out .= '<th>1<sup>e</sup> Transponder *:</th>';
 	if (isset($_REQUEST['transponder'])) {
-		$out .= '<td><input type="text" name="transponder" size="10" value="'.stripslashes($_REQUEST['transponder']).'" /></td>';
+		$out .= '<td colspan="3"><input type="text" name="transponder" size="10" value="'.stripslashes($_REQUEST['transponder']).'" /></td>';
 	} else {
-		$out .= '<td><input type="text" name="transponder" size="10" /></td>';
+		$out .= '<td colspan="3"><input type="text" name="transponder" size="10" /></td>';
 	}
+	$out .= '</tr>';
+
+	$out .= '<tr>';
 	$out .= '<th>2<sup>e</sup> Transponder:';
 	if (isset($_REQUEST['transponder2'])) {
-		$out .= '<td><input type="text" name="transponder2" size="10" value="'.$_REQUEST['transponder2'].'" /></td>';
+		$out .= '<td colspan="3"><input type="text" name="transponder2" size="10" value="'.$_REQUEST['transponder2'].'" /></td>';
 	} else {
-		$out .= '<td><input type="text" name="transponder2" size="10" /></td>';
+		$out .= '<td colspan="3"><input type="text" name="transponder2" size="10" /></td>';
+	}
+	$out .= '</tr>';
+
+	$out .= '<tr>';
+	$out .= '<th>3<sup>e</sup> Transponder:';
+	if (isset($_REQUEST['transponder3'])) {
+		$out .= '<td colspan="3"><input type="text" name="transponder3" size="10" value="'.$_REQUEST['transponder3'].'" /></td>';
+	} else {
+		$out .= '<td colspan="3"><input type="text" name="transponder3" size="10" /></td>';
 	}
 	$out .= '</tr>';
 	

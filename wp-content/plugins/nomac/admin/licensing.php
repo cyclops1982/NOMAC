@@ -98,6 +98,7 @@ function admin_nomac_license_save($year) {
 	$updateData['Freq3'] = strip_tags($_REQUEST['freq3']);
 	$updateData['Transponder'] = strip_tags($_REQUEST['transponder']);
 	$updateData['Transponder2'] = strip_tags($_REQUEST['transponder2']);
+	$updateData['Transponder3'] = strip_tags($_REQUEST['transponder3']);
 	$updateData['VorigeLicentieNr'] = strip_tags($_REQUEST['vorigelicentienr']);
 	$updateData['Klasse'] = strip_tags($_REQUEST['klasse']);
 	$updateData['Bedrag'] = $bedrag;
@@ -242,9 +243,17 @@ function admin_nomac_license_editform($year) {
 
 	$out .= '<tr>';
 	$out .= '<th>1<sup>e</sup> Transponder *:</th>';
-	$out .= '<td><input type="text" name="transponder" size="10" value="'.stripslashes($lic->Transponder).'" /></td>';
+	$out .= '<td colspan="3"><input type="text" name="transponder" size="10" value="'.stripslashes($lic->Transponder).'" /></td>';
+	$out .= '</tr>';
+	
+	$out .= '<tr>';
 	$out .= '<th>2<sup>e</sup> Transponder:';
-	$out .= '<td><input type="text" name="transponder2" size="10" value="'.stripslashes($lic->Transponder2).'" /></td>';
+	$out .= '<td colspan="3"><input type="text" name="transponder2" size="10" value="'.stripslashes($lic->Transponder2).'" /></td>';
+	$out .= '</tr>';
+	
+	$out .= '<tr>';
+	$out .= '<th>3<sup>e</sup> Transponder:';
+	$out .= '<td colspan="3"><input type="text" name="transponder3" size="10" value="'.stripslashes($lic->Transponder3).'" /></td>';
 	$out .= '</tr>';
 	
 	$out .= '<tr>';

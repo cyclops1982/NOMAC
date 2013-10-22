@@ -88,6 +88,7 @@ function createLicensingTable() {
 			Freq3 varchar(20) null,
 			Transponder varchar(10) not null,
 			Transponder2 varchar(10) null,
+			Transponder3 varchar(10) null,
 			VorigeLicentieNr varchar(10) not null,
 			Klasse varchar(10) not null,
 			Bedrag int not null,
@@ -98,7 +99,7 @@ function createLicensingTable() {
 			fotoContentType varchar(50) not null,
 			PRIMARY KEY  (Id)
 		);";
-	create_table($tablename, $sql, "licensing_version", "1.2");
+	create_table($tablename, $sql, "licensing_version", "1.3");
 
 
 	$tablename = $wpdb->prefix . TABLE_FREQUENCY;

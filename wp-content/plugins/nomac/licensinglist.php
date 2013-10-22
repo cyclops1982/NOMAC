@@ -12,12 +12,22 @@ function outputNomacLicensingList($attrs) {
                 return $out;
         }
         $year = (int)$attrs["year"];
-	
-	$rows = $wpdb->get_results("SELECT LIC.Voornaam, LIC.Achternaam, C.Name AS Klasse, LIC.LidBijClub, LIC.RegistrationDate, LIC.Status 
+
+
+        $rows = array();
+	if (isset($attrs["class"])) {
+		$rows = $wpdb->get_results("SELECT LIC.Voornaam, LIC.Achternaam, C.Name AS Klasse, LIC.LidBijClub, LIC.RegistrationDate, LIC.Status 
+								FROM $tLic AS LIC 
+								INNER JOIN $tClass AS C ON C.Code = LIC.Klasse 
+								WHERE Year = $year AND C.Code = '".addslashes($attrs["class"])."' AND LIC.Status <> 'Verwijderd' AND LIC.Status <> 'Ingetrokken'
+								ORDER BY LIC.Klasse, LIC.RegistrationDate");
+	} else {
+		$rows = $wpdb->get_results("SELECT LIC.Voornaam, LIC.Achternaam, C.Name AS Klasse, LIC.LidBijClub, LIC.RegistrationDate, LIC.Status 
 								FROM $tLic AS LIC 
 								INNER JOIN $tClass AS C ON C.Code = LIC.Klasse 
 								WHERE Year = $year AND LIC.Status <> 'Verwijderd' AND LIC.Status <> 'Ingetrokken'
 								ORDER BY LIC.Klasse, LIC.RegistrationDate");
+	}
 	
 	if (count($rows) > 0) {
 		$prevClass = "";
