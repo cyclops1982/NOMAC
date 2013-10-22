@@ -24,7 +24,7 @@ function outputNomacLicensingList($attrs) {
 		$out .= '<table>';
 		foreach ($rows as $row) {
 			if ($prevClass != $row->Klasse) {
-				$out .= '<tr><th colspan="4" class="header">' . $row->Klasse .'</th></tr>';
+				$out .= '<tr><th colspan="4" class="header" id="'.$row->Klasse.'">' . $row->Klasse .'</th></tr>';
 				$out .= '<tr><th>Naam</th><th>Klasse</th><th>Club</th><th>Status</th></tr>';
 				$prevClass = $row->Klasse;
 			}
