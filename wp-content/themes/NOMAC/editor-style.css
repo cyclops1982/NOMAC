@@ -6,8 +6,15 @@ Description: Used to style the TinyMCE editor.
 html .mceContentBody {
 	max-width: 645px;
 }
+
+
+div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td {
+        margin:0;
+        padding:0;
+}
+
 *, body {
-	font-family: Arial, Helvertica, Sans-Serif;
+ 	font-family: Arial, Helvertica, Sans-Serif;
 	font-size: 12px;
 	color: #000;
 	background-colof:#fff;
@@ -58,14 +65,22 @@ hr {
 p, ul, ol, dl {
 }
 p {
+	margin-bottom: 1em;
 }
-ul, ol {
+
+
+ul,ol {
+        margin:0;
+        padding:0;
 }
+
 ul {
-	list-style: square;
+	list-style: circle;
+        list-style-position:inside;
 }
 ol {
 	list-style-type: decimal;
+        list-style-position:inside;
 }
 strong {
 	font-weight: bold;
