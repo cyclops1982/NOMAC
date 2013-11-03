@@ -36,6 +36,7 @@ add_shortcode('nomac-licensing-list', 'outputNomacLicensingList');
 add_shortcode('nomac-licensing-totals', 'outputNomacLicensingTotals');
 add_shortcode('nomac-rulechange-form', 'outputNomacRulechangeForm');
 add_shortcode('nomac-rulechange-list', 'outputNomacRulechangeList');
+add_shortcode('nomac-rulechange-list-links', 'outputNomacRulechangeLinks');
 
 
 /* Installation / DB Creation */
