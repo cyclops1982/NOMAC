@@ -3,6 +3,7 @@ function admin_nomac_rulechange() {
 	global $wpdb;
 
 	$tRuleChange = $wpdb->prefix . TABLE_RULECHANGE;
+	$tClass = $wpdb->prefix . TABLE_CLASS;
 
     echo '<div class="wrap">';
     screen_icon('users');
@@ -14,8 +15,9 @@ function admin_nomac_rulechange() {
 		$_SESSION['LIC_YEAR'] = date('Y');
 	}
 	if (isset($_REQUEST['do'])) {
-		if ( $_REQUEST['do'] == "Selecteer Jaar") {
-			$_SESSION['LIC_YEAR'] = $_REQUEST['year'];
+		if ( $_REQUEST['do'] == "Selecteer Jaar/klasse") {
+			$_SESSION['LIC_YEAR'] = stripslashes($_REQUEST['year']);
+			$_SESSION['LIC_CLASS'] = stripslashes($_REQUEST['class']);
 		} else if ($_REQUEST['do'] == "Aangevinkte items verwijderen") {
 			echo "<ul>";
 			foreach ($_REQUEST['delete'] as $statkey => $statval) {
@@ -47,26 +49,49 @@ function admin_nomac_rulechange() {
 		}
 	}
 	echo '</select>';
-	echo '<input class="button-secondary" type="submit" name="do" value="Selecteer Jaar" />';
+
+
+	$classes = $wpdb->get_results("SELECT Id, Code, Name FROM $tClass");
+	echo 'Selecteer een klasse: ';
+	echo '<select name="class">';
+	echo '<option value="">Alle</option>';
+	foreach ($classes as $class) {
+		if ($_SESSION['LIC_CLASS'] == $class->Code) {
+			echo '<option value="'.$class->Code.'" selected="selected">'.$class->Name.'</option>';
+		} else {
+			echo '<option value="'.$class->Code.'">'.$class->Name.'</option>';
+		}
+	}
+	echo '</select>';
+
+
+	echo '<input class="button-secondary" type="submit" name="do" value="Selecteer Jaar/klasse" />';
+	echo '</form>';	
+
 
 	echo "Lijst voor het seizoen/jaar " . $_SESSION['LIC_YEAR'];
+	if (!empty($_SESSION['Class'])) {
+		echo " en klasse " . $_SESSION['Class'];
+	}
 	echo "<br />";
 
-	echo '</form>';	
-	admin_nomac_rulechangelist($_SESSION['LIC_YEAR']);
+	admin_nomac_rulechangelist($_SESSION['LIC_YEAR'], $_SESSION['LIC_CLASS']);
 	echo "</div>";
 
 }
 
 
-function admin_nomac_rulechangelist($year) {
+function admin_nomac_rulechangelist($year, $class) {
 	global $wpdb;
 	$out = "";
 	
 	$tRuleChange = $wpdb->prefix . TABLE_RULECHANGE;
 	$tClass = $wpdb->prefix . TABLE_CLASS;
 
-	$rows = $wpdb->get_results("SELECT RC.Id, RC.SubmittedBy, RC.SubmitterEmail, RC.SubmittedOn, C.Name AS Class, RC.Page, RC.Article, RC.OldText, RC.NewText, RC.Comment FROM $tRuleChange AS RC INNER JOIN $tClass AS C ON C.Code = RC.Class WHERE Year = $year AND RC.Deleted=0 ORDER BY C.Code, RC.SubmittedOn");
+	if (!empty($class)) {
+			$classWhere = " AND C.Code = '".$class."' ";
+	}
+	$rows = $wpdb->get_results("SELECT RC.Id, RC.SubmittedBy, RC.SubmitterEmail, RC.SubmittedOn, C.Name AS Class, RC.Page, RC.Article, RC.OldText, RC.NewText, RC.Comment FROM $tRuleChange AS RC INNER JOIN $tClass AS C ON C.Code = RC.Class WHERE Year = $year AND RC.Deleted=0 $classWhere ORDER BY C.Code, RC.SubmittedOn");
 	
 
 	if (count($rows) > 0) {
