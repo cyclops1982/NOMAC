@@ -52,6 +52,7 @@ function admin_nomac_imagecycle()
 function admin_nomac_imagecycle_outputform($row)
 {
 	if (!isset($row)) {
+		$row = new stdClass();
 		$row->image_url = "";
 		$row->title = "";
 		$row->link_url = "";

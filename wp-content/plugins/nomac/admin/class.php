@@ -62,6 +62,7 @@ function admin_nomac_class() {
 function admin_nomac_class_outputform($row)
 {
 	if (!isset($row)) {
+		$row = new stdClass();
 		$row->Id = 0;
 		$row->Code = "";
 		$row->Name = "";

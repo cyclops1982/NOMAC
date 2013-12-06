@@ -52,6 +52,7 @@ function admin_nomac_frequency() {
 function admin_nomac_frequency_outputform($row)
 {
 	if (!isset($row)) {
+		$row = new stdClass();
 		$row->Code = "";
 		$row->Name = "";
 		$row->Id = 0;
