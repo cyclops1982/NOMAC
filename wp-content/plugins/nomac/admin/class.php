@@ -44,7 +44,7 @@ function admin_nomac_class() {
 
 	$classes = $wpdb->get_results("SELECT Id, Code, Name, CloseDate, MaxDrivers, MaxDriversCloseDate, Price FROM ".$tablename);
 	if (count($classes) > 0) {
-		echo '<table claclassesss="wp-list-table widefat">';
+		echo '<table class="wp-list-table widefat">';
 		echo '<thead><tr><th>Code</th><th>Name</th><th>Sluitings datum</th><th>Rijders Limiet</th><th>Rijders Limiet Sluitings Datum</th><th>Price</th><th>Action</th><th></th></tr></thead>';
 		echo '<tbody>';
 		foreach ($classes as $class)
