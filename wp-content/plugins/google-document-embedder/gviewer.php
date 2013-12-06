@@ -8,7 +8,7 @@ Author: Kevin Davis
 Author URI: http://www.davistribe.org/
 Text Domain: gde
 Domain Path: /languages/
-Version: 2.5.9
+Version: 2.5.12
 License: GPLv2
 */
 
@@ -38,7 +38,7 @@ License: GPLv2
  */
 
 // boring init junk
-$gde_ver 				= "2.5.9.98";
+$gde_ver 				= "2.5.12.98";
 $gde_db_ver 			= "1.2";		// update also in gde_activate()
 
 require_once( plugin_dir_path( __FILE__ ) . 'functions.php' );
@@ -331,14 +331,8 @@ if ( is_admin() ) {
 	// add quick settings link to plugin list
 	add_filter( "plugin_action_links_" . plugin_basename( __FILE__ ), 'gde_actlinks' );
 	
-	// beta notification (if enabled)
-	if ( gde_check_for_beta( __FILE__ ) ) {
-		// override plugin update text
-		add_action( 'admin_enqueue_scripts', 'gde_admin_beta_js_update' );
-	} else {
-		// no update available, but notify if currently using a beta
-		add_action( 'after_plugin_row', 'gde_warn_on_plugin_page' );
-	}
+	// notify if currently using a beta
+	add_action( 'after_plugin_row', 'gde_warn_on_plugin_page' );
 	
 	// editor integration
 	if ( ! isset( $gdeoptions['ed_disable'] ) || $gdeoptions['ed_disable'] == "no" ) {
@@ -353,14 +347,8 @@ if ( is_admin() ) {
 			add_filter( 'upload_mimes', 'gde_upload_mimes' );
 		}
 		
-		if ( version_compare( $wp_version, "3.5", "<" ) ) {
-			// embed shortcode instead of link from media library for supported types
-			add_filter( 'attachment_fields_to_edit', 'gde_attachment_fields_to_edit', null, 2 );
-			add_filter( 'media_send_to_editor', 'gde_media_insert', 20, 3 );
-		} else {
-			//add_filter( 'attachment_fields_to_edit', 'gde_attachment_fields_to_edit_35', null, 2 );
-			add_filter( 'media_send_to_editor', 'gde_media_insert_35', 20, 3 );
-		}
+		// embed shortcode instead of link from media library for supported types
+		add_filter( 'media_send_to_editor', 'gde_media_insert', 20, 3 );
 	}
 	
 	// add local settings page

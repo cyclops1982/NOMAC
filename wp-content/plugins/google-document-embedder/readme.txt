@@ -3,8 +3,8 @@ Contributors: k3davis
 Tags: doc, docx, pdf, ppt, pptx, xls, psd, zip, rar, tiff, ttf, office, powerpoint, google
 Author URI: http://www.davistribe.org/code/
 Donate link: http://www.davistribe.org/gde/donate/
-Requires at least: 3.2
-Tested up to: 3.7
+Requires at least: 3.5
+Tested up to: 3.8
 Stable tag: trunk
 License: GPLv2 or later
 
@@ -43,7 +43,7 @@ Translations are welcome; see the [web site](http://www.davistribe.org/gde/notes
 
 * English (en\_US), built-in
 * Czech (cs\_CZ) by Jirka, thanks!
-* Dutch (nl\_NL) by Robert van den Breemen, thanks!
+* Dutch (nl\_NL) by Niko Strijbol, thanks!
 * French (fr\_FR) by [Erwan](http://profiles.wordpress.org/erwanlescop "Erwan"), thanks!
 * Hungarian (hu\_HU) by [szemcse](http://profiles.wordpress.org/szemcse "szemcse"), thanks!
 * Russian (ru\_RU) by J&#243;zek, thanks!
@@ -68,7 +68,7 @@ Go to "GDE Settings" (under "Settings" in the admin panel) to change defaults, o
 
 = Where can the files live? =
 The file to embed must first be publicly available somewhere on the internet, in order for Google to retrieve the document for conversion.
-You can upload it to your WordPress site using the standard techniques, or link to a file on another site.
+You can upload it to your WordPress site using the standard techniques, or link to a file on another site. For testing purposes, your site can run locally or on private networks, but the documents you wish to embed must be publicly accessible.
 
 = How do I embed a file in my page or post? =
 There are several ways you can insert a supported document, depending on your preference:
@@ -135,9 +135,24 @@ More common questions are answered on the GDE web site [here](http://www.davistr
 
 (E) Enhanced Viewer
 
+= 2.5.12 =
+* Changed: Updated mobile detection library
+* Changed: Updated settings navigation style for WP 3.8+
+* Changed: Updated Dutch translation (thanks Niko)
+
+= 2.5.11 =
+* Fixed: Settings and profiles import
+* Changed: Removed more unreachable legacy code
+
+= 2.5.10 =
+* Fixed: PHP warning on multisite during uninstall (thanks TigranTovmasyan)
+* Changed: (E) Viewer settings use native color picker
+* Changed: Now requires WordPress 3.5+ (removed legacy functions)
+
 = 2.5.9 =
 * Fixed: Mixed content restrictions while parent page is SSL
 * Removed: page= shortcode attribute (broken in Google Viewer)
+* Removed: Beta delivery api (server bandwidth issues/WP repo policies)
 
 = 2.5.8 =
 * Added: (E) Right-click menu disabled on secure documents
@@ -214,49 +229,9 @@ More common questions are answered on the GDE web site [here](http://www.davistr
 * Changed: Errors now show inline instead of as HTML comments by default
 * Removed: force= shortcode attribute (redundant and confusing)
 
-= 2.4.6 =
-* Fixed: Error in Mask URL download link for non-PDF file types
-
-= 2.4.5 =
-* Fixed: Regression breaks some files containing spaces (thanks mlautens)
-* Fixed: Mask URL 400 error on filenames with spaces (thanks mrhaanraadts)
-* Fixed: PDF Force Download option doesn't support SSL
-
-= 2.4.4 =
-* Added: PPS and OTF support
-* Fixed: Broken support of international filenames in IE (thanks beredim)
-* Fixed: More robust file size checking with nonstandard filenames
-* Fixed: Global disable cache option not always honored
-* Fixed: (E) Mobile theme not loaded if not globally requested
-* Changed: Now requires WordPress 3.0+ (mainly for support reasons)
-
-= 2.4.3 =
-* Added: (E) Dark theme shortcode option (EXPERIMENTAL)
-* Added: Turkish translation (thanks LettoBlog)
-* Fixed: Visual editor integration for IIS webhosts (thanks Kristof)
-* Changed: Debug information is now a support page from plugin list
-
-= 2.4.2 =
-* Fixed: PHP Warning related to MIME type expansion (thanks Adebayo)
-
-= 2.4.1 =
-* Added: Spanish translation (thanks elarequi)
-* Added: Method to obtain debug information
-* Fixed: Insertion of non-GDE file types from Media Library
-
-= 2.4 =
-* Added: Allow native upload/insert of all supported file types
-* Added: Shortcode inserted from Media Library for supported files
-* Added: Localization support (translations welcome)
-* Added: (E) Ability to use mobile theme
-* Fixed: (E) Toolbar customization on mobile
-* Fixed: Editor integration no longer loads its own TinyMCE/jquery libs
-* Fixed: URL changes for plugin, help links, beta checking
-* Fixed: (E) "Moved Temporarily" error (thanks webmonkeywatts)
-
 [Full history...](http://www.davistribe.org/gde/changelog/ "Full history")
 
 == Upgrade Notice ==
 
-= 2.5.9 =
+= 2.5.12 =
 Maintenance release
