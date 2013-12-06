@@ -42,14 +42,14 @@ function admin_nomac_class() {
 		$wpdb->update($tablename, $data, $id);
 	}
 
-	$frequencies = $wpdb->get_results("SELECT Id, Code, Name, CloseDate, MaxDrivers, MaxDriversCloseDate, Price FROM ".$tablename);
-	if (count($frequencies) > 0) {
-		echo '<table class="wp-list-table widefat">';
+	$classes = $wpdb->get_results("SELECT Id, Code, Name, CloseDate, MaxDrivers, MaxDriversCloseDate, Price FROM ".$tablename);
+	if (count($classes) > 0) {
+		echo '<table claclassesss="wp-list-table widefat">';
 		echo '<thead><tr><th>Code</th><th>Name</th><th>Sluitings datum</th><th>Rijders Limiet</th><th>Rijders Limiet Sluitings Datum</th><th>Price</th><th>Action</th><th></th></tr></thead>';
 		echo '<tbody>';
-		foreach ($frequencies as $freq)
+		foreach ($classes as $class)
 		{
-			admin_nomac_class_outputform($freq);
+			admin_nomac_class_outputform($class);
 		}
 		admin_nomac_class_outputform(null);	
 		echo '</tbody></table>';
